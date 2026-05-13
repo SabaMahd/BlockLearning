@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SFS Compliance Training — Agent Academy</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#060612;--card:#0e0f1e;--border:#1a1b2e;
+  --purple:#7c3aed;--cyan:#06b6d4;--green:#10b981;
+  --red:#ef4444;--amber:#f59e0b;--pink:#ec4899;
+  --text:#e2e8f0;--muted:#64748b;--soft:#94a3b8;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+/* ─ CANVAS CONFETTI ─ */
+#confetti-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999}
+
+/* ─ FLASH OVERLAY ─ */
+#flash{position:fixed;inset:0;pointer-events:none;z-index:998;opacity:0;transition:opacity .15s}
+
+/* ─ SCREENS ─ */
+.screen{display:none;min-height:100vh;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem}
+.screen.active{display:flex}
+
+/* ─ WELCOME ─ */
+#s-welcome{background:radial-gradient(ellipse at 20% 50%,#1a0a3d 0%,var(--bg) 60%),radial-gradient(ellipse at 80% 20%,#0a2a3d 0%,transparent 50%)}
+.hero-badge{background:linear-gradient(135deg,var(--purple),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-size:.8rem;font-weight:800;letter-spacing:.2em;text-transform:uppercase;margin-bottom:1rem}
+.hero-title{font-size:clamp(2.2rem,6vw,4rem);font-weight:900;text-align:center;line-height:1.1;margin-bottom:1rem}
+.hero-title .grad{background:linear-gradient(135deg,var(--purple),var(--cyan),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero-sub{color:var(--soft);font-size:1rem;text-align:center;max-width:500px;line-height:1.7;margin-bottom:2.5rem}
+.game-hub{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;max-width:860px;width:100%;margin-bottom:2.5rem}
+.hub-card{background:var(--card);border:1.5px solid var(--border);border-radius:16px;padding:1.25rem;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.hub-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--c1,.2),var(--c2,.2));opacity:0;transition:opacity .2s}
+.hub-card:hover{transform:translateY(-4px);border-color:var(--c1,#7c3aed)}
+.hub-card:hover::before{opacity:1}
+.hub-icon{font-size:2.2rem;margin-bottom:.6rem}
+.hub-name{font-weight:800;font-size:1rem;margin-bottom:.25rem}
+.hub-desc{font-size:.78rem;color:var(--muted)}
+.hub-pts{position:absolute;top:.75rem;right:.75rem;background:rgba(255,255,255,.06);border-radius:99px;padding:.2rem .6rem;font-size:.7rem;font-weight:700;color:var(--soft)}
+.btn-primary{background:linear-gradient(135deg,var(--purple),#4f46e5);color:#fff;border:none;padding:1rem 3rem;border-radius:50px;font-size:1.05rem;font-weight:800;cursor:pointer;transition:all .2s;box-shadow:0 0 30px rgba(124,58,237,.4)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 0 50px rgba(124,58,237,.6)}
+
+/* ─ GAME HEADER ─ */
+.game-header{position:sticky;top:0;z-index:10;background:rgba(6,6,18,.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:.85rem 1.5rem;display:flex;align-items:center;gap:1rem;width:100%}
+.gh-title{font-weight:800;font-size:1rem;flex:1}
+.gh-title span{background:linear-gradient(135deg,var(--purple),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.gh-streak{display:flex;align-items:center;gap:.3rem;font-size:.85rem;font-weight:700}
+.gh-streak .fire{font-size:1.1rem}
+.prog-wrap{flex:1;max-width:240px}
+.prog-meta{display:flex;justify-content:space-between;font-size:.72rem;color:var(--muted);margin-bottom:.3rem}
+.prog-bg{background:#1a1b2e;border-radius:99px;height:6px;overflow:hidden}
+.prog-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--purple),var(--cyan));transition:width .4s ease}
+.xp-badge{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:.35rem .8rem;font-size:.82rem;font-weight:800;white-space:nowrap}
+.xp-badge .xp{color:var(--amber)}
+
+/* ─ QUIZ BLITZ ─ */
+#s-blitz .qcard{background:var(--card);border:1.5px solid var(--border);border-radius:20px;padding:2rem;max-width:720px;width:100%;margin-top:1.5rem}
+.timer-ring-wrap{display:flex;align-items:center;justify-content:center;margin-bottom:1.25rem}
+.timer-ring{width:64px;height:64px;position:relative}
+.timer-ring svg{transform:rotate(-90deg)}
+.timer-ring circle{fill:none;stroke-width:5;stroke-linecap:round}
+.timer-bg{stroke:#1a1b2e}
+.timer-fg{stroke:var(--cyan);transition:stroke-dashoffset .9s linear,stroke .3s}
+.timer-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:800}
+.q-module-tag{display:inline-block;background:rgba(124,58,237,.15);color:#a78bfa;border:1px solid rgba(124,58,237,.3);border-radius:99px;padding:.2rem .75rem;font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:1rem}
+.q-text{font-size:1.1rem;font-weight:600;line-height:1.55;margin-bottom:1.5rem}
+.scenario-chip{background:rgba(6,182,212,.08);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:.75rem 1rem;font-size:.85rem;color:#7dd3fc;line-height:1.6;margin-bottom:1.25rem}
+.ans-grid{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
+@media(max-width:540px){.ans-grid{grid-template-columns:1fr}}
+.ans-btn{background:#12132a;border:1.5px solid var(--border);border-radius:12px;padding:.85rem 1rem;text-align:left;color:var(--soft);font-size:.88rem;line-height:1.45;cursor:pointer;transition:all .15s;display:flex;align-items:flex-start;gap:.65rem}
+.ans-btn .ltr{background:#1a1b2e;border-radius:5px;padding:.12rem .4rem;font-size:.72rem;font-weight:800;color:var(--muted);flex-shrink:0;margin-top:.05rem;transition:all .15s}
+.ans-btn:hover:not(:disabled){background:#1a1b2e;border-color:var(--purple);color:var(--text)}
+.ans-btn:hover:not(:disabled) .ltr{background:rgba(124,58,237,.25);color:#a78bfa}
+.ans-btn.correct{background:rgba(16,185,129,.1);border-color:var(--green);color:var(--text);animation:popIn .25s ease}
+.ans-btn.correct .ltr{background:rgba(16,185,129,.25);color:var(--green)}
+.ans-btn.wrong{background:rgba(239,68,68,.08);border-color:var(--red);color:var(--text);animation:shake .3s ease}
+.ans-btn.wrong .ltr{background:rgba(239,68,68,.2);color:var(--red)}
+.ans-btn:disabled{cursor:default}
+.fb-box{margin-top:1.1rem;border-radius:12px;padding:.9rem 1rem;display:none;animation:fadeUp .2s ease}
+.fb-box.ok{background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.25)}
+.fb-box.bad{background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2)}
+.fb-title{font-weight:800;font-size:.9rem;margin-bottom:.3rem}
+.fb-box.ok .fb-title{color:var(--green)}
+.fb-box.bad .fb-title{color:var(--red)}
+.fb-text{font-size:.82rem;color:var(--soft);line-height:1.6}
+.sop-tag{background:rgba(6,182,212,.15);color:var(--cyan);border-radius:4px;padding:.08rem .4rem;font-size:.72rem;font-weight:700;margin-left:.25rem}
+.btn-next{display:none;width:100%;margin-top:1rem;background:linear-gradient(135deg,var(--purple),#4f46e5);color:#fff;border:none;padding:.8rem;border-radius:10px;font-size:.95rem;font-weight:800;cursor:pointer;transition:all .15s}
+.btn-next:hover{filter:brightness(1.1)}
+
+/* ─ MATCH MASTER ─ */
+#s-match .match-wrap{max-width:820px;width:100%}
+.match-title{font-size:1.3rem;font-weight:800;text-align:center;margin:1.5rem 0 .4rem}
+.match-sub{color:var(--muted);font-size:.85rem;text-align:center;margin-bottom:1.5rem}
+.match-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:580px){.match-grid{grid-template-columns:1fr}}
+.match-col{display:flex;flex-direction:column;gap:.6rem}
+.match-col-label{font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.25rem;text-align:center}
+.match-card{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:.8rem 1rem;font-size:.85rem;cursor:pointer;transition:all .18s;text-align:center;line-height:1.45;user-select:none;min-height:52px;display:flex;align-items:center;justify-content:center}
+.match-card:hover:not(.matched):not(.selected){border-color:var(--purple);color:var(--text);background:#12132a}
+.match-card.selected{border-color:var(--cyan);background:rgba(6,182,212,.1);color:var(--cyan)}
+.match-card.matched{border-color:var(--green);background:rgba(16,185,129,.1);color:var(--green);cursor:default;animation:popIn .3s ease}
+.match-card.wrong-flash{border-color:var(--red);background:rgba(239,68,68,.1);animation:shake .3s ease}
+.match-card.matched::before{content:'✓ ';font-weight:900}
+.match-progress{text-align:center;margin-top:1rem;font-size:.85rem;color:var(--muted)}
+.match-progress span{color:var(--green);font-weight:800}
+
+/* ─ SORT SQUAD ─ */
+#s-sort .sort-wrap{max-width:800px;width:100%}
+.sort-buckets{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:1.5rem}
+@media(max-width:540px){.sort-buckets{grid-template-columns:1fr}}
+.bucket{background:var(--card);border:2px dashed var(--border);border-radius:14px;padding:1rem;text-align:center;transition:all .2s;min-height:80px}
+.bucket.hover-target{border-color:var(--purple);background:rgba(124,58,237,.08)}
+.bucket-icon{font-size:1.8rem;margin-bottom:.35rem}
+.bucket-name{font-size:.82rem;font-weight:800;margin-bottom:.2rem}
+.bucket-count{font-size:.7rem;color:var(--muted)}
+.bucket.correct-drop{border-color:var(--green);animation:popIn .3s ease}
+.bucket.wrong-drop{border-color:var(--red);animation:shake .3s ease}
+.sort-card{background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:1.25rem;max-width:580px;width:100%;margin:0 auto;text-align:center;font-size:.95rem;font-weight:600;line-height:1.55;transition:all .2s;animation:fadeUp .25s ease}
+.sort-card .sort-scenario-label{font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.5rem}
+.sort-buttons{display:flex;gap:.65rem;justify-content:center;margin-top:1rem;flex-wrap:wrap}
+.sort-btn{padding:.6rem 1.2rem;border-radius:99px;border:1.5px solid var(--border);background:var(--card);color:var(--soft);font-size:.85rem;font-weight:700;cursor:pointer;transition:all .15s}
+.sort-btn:hover{border-color:var(--purple);color:var(--text);background:#12132a}
+.sort-fb{margin-top:.75rem;font-size:.82rem;text-align:center;min-height:1.2em;color:var(--muted)}
+
+/* ─ CASE CRACKER ─ */
+#s-case .case-wrap{max-width:720px;width:100%}
+.case-header{background:linear-gradient(135deg,rgba(124,58,237,.15),rgba(6,182,212,.1));border:1px solid var(--border);border-radius:16px;padding:1.25rem;margin-bottom:1.25rem}
+.case-badge{display:inline-flex;align-items:center;gap:.4rem;background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.3);border-radius:99px;padding:.25rem .85rem;font-size:.72rem;font-weight:800;color:#a78bfa;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.75rem}
+.case-title{font-size:1.2rem;font-weight:800;margin-bottom:.5rem}
+.case-detail{font-size:.85rem;color:var(--soft);line-height:1.7}
+.case-detail strong{color:var(--text)}
+.case-step{background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:1.25rem;margin-bottom:1rem;animation:fadeUp .25s ease}
+.case-step-num{font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.5rem}
+.case-q{font-size:1rem;font-weight:700;margin-bottom:1rem;line-height:1.5}
+.case-choices{display:flex;flex-direction:column;gap:.55rem}
+.case-btn{background:#12132a;border:1.5px solid var(--border);border-radius:10px;padding:.85rem 1rem;text-align:left;color:var(--soft);font-size:.87rem;line-height:1.5;cursor:pointer;transition:all .15s}
+.case-btn:hover:not(:disabled){border-color:var(--cyan);color:var(--text);background:#1a1b2e}
+.case-btn.chosen.right{border-color:var(--green);background:rgba(16,185,129,.1);color:var(--text);animation:popIn .25s ease}
+.case-btn.chosen.wrong{border-color:var(--red);background:rgba(239,68,68,.08);color:var(--text);animation:shake .3s ease}
+.case-result{font-size:.82rem;color:var(--soft);line-height:1.6;margin-top:.6rem;padding:.75rem;background:rgba(255,255,255,.03);border-radius:8px;display:none}
+.case-result.show{display:block;animation:fadeUp .2s ease}
+
+/* ─ ROUND COMPLETE ─ */
+#s-round{text-align:center}
+.round-icon{font-size:5rem;margin-bottom:1rem;animation:bounceIn .5s ease}
+.round-title{font-size:2.2rem;font-weight:900;margin-bottom:.5rem}
+.round-sub{color:var(--soft);font-size:1rem;margin-bottom:1.5rem}
+.score-ring{width:130px;height:130px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-direction:column;margin:0 auto 2rem;border:4px solid var(--green);box-shadow:0 0 40px rgba(16,185,129,.25)}
+.score-ring .sr-val{font-size:2.2rem;font-weight:900;color:var(--green)}
+.score-ring .sr-lbl{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.stat-row{display:flex;justify-content:center;gap:1.5rem;margin-bottom:2rem;flex-wrap:wrap}
+.stat-pill{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:.6rem 1.25rem;text-align:center}
+.stat-pill .sv{font-size:1.4rem;font-weight:900;color:var(--amber)}
+.stat-pill .sl{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+
+/* ─ FINAL SCREEN ─ */
+#s-final{background:radial-gradient(ellipse at 50% 100%,#1a0a3d,var(--bg) 70%)}
+.final-score{font-size:clamp(3rem,10vw,6rem);font-weight:900;background:linear-gradient(135deg,var(--purple),var(--cyan),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1;margin-bottom:.5rem}
+.final-label{color:var(--muted);font-size:.85rem;text-transform:uppercase;letter-spacing:.1em;margin-bottom:1.5rem}
+.trophy{font-size:5rem;margin-bottom:1rem;animation:bounceIn .6s ease}
+.badge-card{background:var(--card);border:1.5px solid var(--border);border-radius:16px;padding:1.5rem 2rem;max-width:460px;text-align:center;margin-bottom:2rem}
+.badge-title{font-size:1.5rem;font-weight:900;margin-bottom:.35rem}
+.badge-sub{color:var(--soft);font-size:.88rem;line-height:1.6}
+.breakdown{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.65rem;max-width:700px;width:100%;margin-bottom:2rem}
+.bk-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:.75rem;text-align:center}
+.bk-card .bk-game{font-size:.68rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.25rem}
+.bk-card .bk-pts{font-size:1.4rem;font-weight:900}
+
+/* ─ ANIMATIONS ─ */
+@keyframes popIn{0%{transform:scale(.95)}50%{transform:scale(1.04)}100%{transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes bounceIn{0%{transform:scale(0);opacity:0}60%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+.pulse{animation:pulse 1s infinite}
+
+.mt1{margin-top:1rem}
+
+/* ─ STARFIELD ─ */
+#stars-bg{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.star{position:absolute;background:#fff;border-radius:50%;animation:twinkle var(--dur,3s) ease-in-out infinite;animation-delay:var(--delay,0s)}
+@keyframes twinkle{0%,100%{opacity:var(--min-op,.08);transform:scale(1)}50%{opacity:var(--max-op,.7);transform:scale(1.4)}}
+
+/* ─ AMBIENT ORBS ─ */
+.orb{position:absolute;border-radius:50%;filter:blur(80px);pointer-events:none;animation:orbDrift var(--dur,10s) ease-in-out infinite alternate}
+@keyframes orbDrift{from{transform:translate(0,0) scale(1)}to{transform:translate(var(--tx,40px),var(--ty,-30px)) scale(1.15)}}
+
+/* ─ FLOATING XP ─ */
+.xp-float{position:fixed;pointer-events:none;z-index:1001;font-size:1.15rem;font-weight:900;text-shadow:0 0 12px currentColor;animation:xpUp 1.3s ease-out forwards}
+@keyframes xpUp{0%{opacity:1;transform:translateY(0) scale(1.1)}60%{opacity:1;transform:translateY(-55px) scale(1.2)}100%{opacity:0;transform:translateY(-100px) scale(.9)}}
+
+/* ─ STREAK FIRE ─ */
+.fire-hot{animation:fireGrow .4s ease-in-out infinite alternate;display:inline-block}
+@keyframes fireGrow{from{transform:scale(1) rotate(-5deg)}to{transform:scale(1.5) rotate(5deg)}}
+.streak-3{color:var(--amber)}
+.streak-5{color:var(--red)}
+
+/* ─ GLOW EFFECTS ─ */
+.ans-btn.correct{box-shadow:0 0 22px rgba(16,185,129,.45)!important}
+.ans-btn.wrong{box-shadow:0 0 14px rgba(239,68,68,.35)!important}
+.match-card.selected{box-shadow:0 0 18px rgba(6,182,212,.55)!important}
+.match-card.matched{box-shadow:0 0 20px rgba(16,185,129,.4)!important}
+.bucket.correct-drop{box-shadow:0 0 28px rgba(16,185,129,.45)}
+.hub-card:hover{box-shadow:0 0 35px rgba(124,58,237,.4)}
+.btn-primary:hover{box-shadow:0 0 55px rgba(124,58,237,.7)!important}
+.score-ring{animation:ringPulse 2s ease-in-out infinite}
+@keyframes ringPulse{0%,100%{box-shadow:0 0 40px rgba(16,185,129,.25)}50%{box-shadow:0 0 70px rgba(16,185,129,.55)}}
+
+/* ─ CASE CORRECT GLOW ─ */
+.case-btn.chosen.right{box-shadow:0 0 18px rgba(16,185,129,.4)!important}
+
+/* ─ ENSURE SCREENS ABOVE STARS ─ */
+.screen{position:relative;z-index:1}
+.game-header{z-index:11}
+#confetti-canvas{z-index:999}
+#flash{z-index:998}
+</style>
+</head>
+<body>
+<div id="stars-bg"></div>
+<canvas id="confetti-canvas"></canvas>
+<div id="flash"></div>
+
+<!-- ══ WELCOME ══ -->
+<div id="s-welcome" class="screen active">
+  <div class="orb" style="width:500px;height:500px;background:var(--purple);opacity:.12;top:-150px;left:-100px;--dur:12s;--tx:60px;--ty:40px"></div>
+  <div class="orb" style="width:400px;height:400px;background:var(--cyan);opacity:.1;bottom:-100px;right:-80px;--dur:9s;--tx:-40px;--ty:-50px"></div>
+  <div class="orb" style="width:300px;height:300px;background:var(--green);opacity:.08;top:40%;left:60%;--dur:14s;--tx:30px;--ty:60px"></div>
+  <div class="hero-badge">Square Financial Services</div>
+  <h1 class="hero-title">Agent Academy<br><span class="grad">Compliance Training</span></h1>
+  <p class="hero-sub">Master the SFS Loan Application Compliance Review SOP V3 through 4 fun game modes. Earn XP, build streaks, crack cases.</p>
+  <div class="game-hub">
+    <div class="hub-card" style="--c1:#7c3aed;--c2:#4f46e5" onclick="startBlitz()">
+      <div class="hub-pts">200 XP</div>
+      <div class="hub-icon">⚡</div>
+      <div class="hub-name">Blitz Quiz</div>
+      <div class="hub-desc">20 timed questions with streak multipliers</div>
+    </div>
+    <div class="hub-card" style="--c1:#06b6d4;--c2:#0891b2" onclick="startMatch()">
+      <div class="hub-pts">150 XP</div>
+      <div class="hub-icon">🔗</div>
+      <div class="hub-name">Match Master</div>
+      <div class="hub-desc">Pair up terms, AANs & scenarios</div>
+    </div>
+    <div class="hub-card" style="--c1:#10b981;--c2:#059669" onclick="startSort()">
+      <div class="hub-pts">100 XP</div>
+      <div class="hub-icon">🗂️</div>
+      <div class="hub-name">Sort Squad</div>
+      <div class="hub-desc">Categorize blockers and actions fast</div>
+    </div>
+    <div class="hub-card" style="--c1:#f59e0b;--c2:#d97706" onclick="startCase()">
+      <div class="hub-pts">250 XP</div>
+      <div class="hub-icon">🕵️</div>
+      <div class="hub-name">Case Cracker</div>
+      <div class="hub-desc">Navigate real case scenarios step by step</div>
+    </div>
+  </div>
+  <button class="btn-primary" onclick="startAll()">▶ Play All Games</button>
+</div>
+
+<!-- ══ BLITZ QUIZ ══ -->
+<div id="s-blitz" class="screen">
+  <div style="width:100%;max-width:720px">
+    <div class="game-header" style="border-radius:16px 16px 0 0;position:relative">
+      <div class="gh-title">⚡ <span>Blitz Quiz</span></div>
+      <div class="gh-streak"><span class="fire">🔥</span><span id="blitz-streak">0</span>x</div>
+      <div class="prog-wrap">
+        <div class="prog-meta"><span id="blitz-qnum">Q1/20</span><span id="blitz-mod"></span></div>
+        <div class="prog-bg"><div class="prog-fill" id="blitz-prog" style="width:0%"></div></div>
+      </div>
+      <div class="xp-badge">XP: <span class="xp" id="blitz-xp">0</span></div>
+    </div>
+    <div class="qcard" style="border-radius:0 0 20px 20px;border-top:none">
+      <div class="timer-ring-wrap">
+        <div class="timer-ring">
+          <svg width="64" height="64" viewBox="0 0 64 64">
+            <circle class="timer-bg" cx="32" cy="32" r="26" stroke-dasharray="163" stroke-dashoffset="0"/>
+            <circle class="timer-fg" id="timer-circle" cx="32" cy="32" r="26" stroke-dasharray="163" stroke-dashoffset="0"/>
+          </svg>
+          <div class="timer-num" id="timer-num">20</div>
+        </div>
+      </div>
+      <div class="q-module-tag" id="blitz-tag">Module</div>
+      <div class="scenario-chip" id="blitz-scenario" style="display:none"></div>
+      <div class="q-text" id="blitz-q"></div>
+      <div class="ans-grid" id="blitz-ans"></div>
+      <div class="fb-box" id="blitz-fb">
+        <div class="fb-title" id="blitz-fb-title"></div>
+        <div class="fb-text" id="blitz-fb-text"></div>
+      </div>
+      <button class="btn-next" id="blitz-next" onclick="blitzNext()">Next →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MATCH MASTER ══ -->
+<div id="s-match" class="screen">
+  <div class="match-wrap">
+    <div class="game-header" style="border-radius:16px;margin-bottom:1rem">
+      <div class="gh-title">🔗 <span>Match Master</span></div>
+      <div class="prog-wrap">
+        <div class="prog-meta"><span id="match-round-lbl">Round 1/3</span><span id="match-topic"></span></div>
+        <div class="prog-bg"><div class="prog-fill" id="match-prog" style="width:0%"></div></div>
+      </div>
+      <div class="xp-badge">XP: <span class="xp" id="match-xp">0</span></div>
+    </div>
+    <div class="match-title" id="match-title"></div>
+    <div class="match-sub" id="match-sub">Click one card from each column to make a match</div>
+    <div class="match-grid">
+      <div>
+        <div class="match-col-label">Column A</div>
+        <div class="match-col" id="match-left"></div>
+      </div>
+      <div>
+        <div class="match-col-label">Column B</div>
+        <div class="match-col" id="match-right"></div>
+      </div>
+    </div>
+    <div class="match-progress">Matched: <span id="match-count">0</span> / <span id="match-total">6</span></div>
+  </div>
+</div>
+
+<!-- ══ SORT SQUAD ══ -->
+<div id="s-sort" class="screen">
+  <div class="sort-wrap">
+    <div class="game-header" style="border-radius:16px;margin-bottom:1rem">
+      <div class="gh-title">🗂️ <span>Sort Squad</span></div>
+      <div class="prog-wrap">
+        <div class="prog-meta"><span id="sort-num">Card 1/12</span><span>Sort the scenario</span></div>
+        <div class="prog-bg"><div class="prog-fill" id="sort-prog" style="width:0%"></div></div>
+      </div>
+      <div class="xp-badge">XP: <span class="xp" id="sort-xp">0</span></div>
+    </div>
+    <div class="sort-buckets" id="sort-buckets"></div>
+    <div class="sort-card" id="sort-card">
+      <div class="sort-scenario-label">Scenario</div>
+      <div id="sort-card-text"></div>
+    </div>
+    <div class="sort-fb" id="sort-fb"></div>
+    <div class="sort-buttons" id="sort-btns"></div>
+  </div>
+</div>
+
+<!-- ══ CASE CRACKER ══ -->
+<div id="s-case" class="screen">
+  <div class="case-wrap">
+    <div class="game-header" style="border-radius:16px;margin-bottom:1rem">
+      <div class="gh-title">🕵️ <span>Case Cracker</span></div>
+      <div class="prog-wrap">
+        <div class="prog-meta"><span id="case-prog-lbl">Case 1/3</span><span>Compliance Review</span></div>
+        <div class="prog-bg"><div class="prog-fill" id="case-prog-fill" style="width:0%"></div></div>
+      </div>
+      <div class="xp-badge">XP: <span class="xp" id="case-xp">0</span></div>
+    </div>
+    <div id="case-content"></div>
+  </div>
+</div>
+
+<!-- ══ ROUND COMPLETE ══ -->
+<div id="s-round" class="screen">
+  <div class="round-icon" id="round-icon">🎉</div>
+  <h2 class="round-title" id="round-title">Round Complete!</h2>
+  <p class="round-sub" id="round-sub"></p>
+  <div class="score-ring" id="round-ring">
+    <div class="sr-val" id="round-val">0</div>
+    <div class="sr-lbl">XP Earned</div>
+  </div>
+  <div class="stat-row" id="round-stats"></div>
+  <button class="btn-primary" id="round-next-btn" onclick="roundNext()">Continue →</button>
+</div>
+
+<!-- ══ FINAL SCREEN ══ -->
+<div id="s-final" class="screen">
+  <div class="trophy" id="final-trophy">🏆</div>
+  <h1 class="hero-title" style="text-align:center;margin-bottom:.25rem" id="final-title">Training Complete!</h1>
+  <div class="final-score" id="final-score">0</div>
+  <div class="final-label">Total XP Earned</div>
+  <div class="badge-card">
+    <div class="badge-title" id="final-badge-title">Badge</div>
+    <div class="badge-sub" id="final-badge-sub"></div>
+  </div>
+  <div class="breakdown" id="final-breakdown"></div>
+  <button class="btn-primary" onclick="location.reload()">🔄 Play Again</button>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// STARS
+// ═══════════════════════════════════════════════════════════
+(function initStars(){
+  const bg=document.getElementById('stars-bg');
+  for(let i=0;i<90;i++){
+    const s=document.createElement('div');
+    s.className='star';
+    const sz=Math.random()*2.5+.5;
+    s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;--dur:${(Math.random()*4+2).toFixed(1)}s;--delay:${(Math.random()*5).toFixed(1)}s;--min-op:${(Math.random()*.08+.03).toFixed(2)};--max-op:${(Math.random()*.5+.25).toFixed(2)}`;
+    bg.appendChild(s);
+  }
+})();
+
+// ═══════════════════════════════════════════════════════════
+// FLOATING XP
+// ═══════════════════════════════════════════════════════════
+function floatXP(pts, color, mult){
+  const el=document.createElement('div');
+  el.className='xp-float';
+  el.style.color=color||'#f59e0b';
+  el.style.left=`${Math.random()*50+25}%`;
+  el.style.top=`${Math.random()*20+35}%`;
+  el.textContent=mult&&mult>1?`+${pts} XP  ${mult}x🔥`:`+${pts} XP ✨`;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),1400);
+}
+
+// ═══════════════════════════════════════════════════════════
+// CONFETTI
+// ═══════════════════════════════════════════════════════════
+const cc = document.getElementById('confetti-canvas');
+const ctx = cc.getContext('2d');
+let confettiParts = [];
+function launchConfetti(){
+  cc.width = window.innerWidth; cc.height = window.innerHeight;
+  confettiParts = Array.from({length:150},()=>({
+    x:Math.random()*cc.width, y:-10,
+    r:Math.random()*6+3,
+    d:Math.random()*10+5,
+    color:['#7c3aed','#06b6d4','#10b981','#f59e0b','#ec4899','#fff','#a78bfa','#34d399'][Math.floor(Math.random()*8)],
+    shape:['circle','rect','star'][Math.floor(Math.random()*3)],
+    tilt:Math.random()*360, spin:Math.random()*6-3,
+    speed:Math.random()*3+2
+  }));
+  requestAnimationFrame(drawConfetti);
+}
+function drawStar(cx,cy,ir,or,pts,color){
+  ctx.beginPath();
+  for(let i=0;i<pts*2;i++){
+    const r=i%2===0?or:ir;
+    const a=(i*Math.PI)/pts-Math.PI/2;
+    i===0?ctx.moveTo(cx+r*Math.cos(a),cy+r*Math.sin(a)):ctx.lineTo(cx+r*Math.cos(a),cy+r*Math.sin(a));
+  }
+  ctx.closePath();ctx.fillStyle=color;ctx.fill();
+}
+function drawConfetti(){
+  ctx.clearRect(0,0,cc.width,cc.height);
+  confettiParts.forEach(p=>{
+    ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.tilt*Math.PI/180);
+    if(p.shape==='rect'){ctx.fillStyle=p.color;ctx.fillRect(-p.r,-p.r/2,p.r*2,p.r)}
+    else if(p.shape==='star'){drawStar(0,0,p.r/2,p.r,5,p.color)}
+    else{ctx.beginPath();ctx.arc(0,0,p.r,0,Math.PI*2);ctx.fillStyle=p.color;ctx.fill()}
+    ctx.restore();
+    p.y+=p.speed; p.x+=Math.sin(p.d)*1.8; p.d+=.05; p.tilt+=p.spin;
+  });
+  confettiParts = confettiParts.filter(p=>p.y<cc.height+20);
+  if(confettiParts.length) requestAnimationFrame(drawConfetti);
+  else ctx.clearRect(0,0,cc.width,cc.height);
+}
+
+// FLASH
+function flash(color){
+  const f=document.getElementById('flash');
+  f.style.background=color; f.style.opacity='.18';
+  setTimeout(()=>f.style.opacity='0',200);
+}
+
+// SHOW SCREEN
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.display='none'});
+  const s=document.getElementById(id);
+  s.style.display='flex'; s.classList.add('active');
+}
+
+// ═══════════════════════════════════════════════════════════
+// GLOBAL STATE
+// ═══════════════════════════════════════════════════════════
+const G = { totalXP:0, blitzXP:0, matchXP:0, sortXP:0, caseXP:0, mode:'all', queue:[] };
+
+// ═══════════════════════════════════════════════════════════
+// ⚡ BLITZ QUIZ DATA (20 questions)
+// ═══════════════════════════════════════════════════════════
+const BLITZ_Q = [
+  {tag:'Definitions',sc:null,q:'What does SSP stand for?',a:['Square Secure Profile','Seller Support Protocol','Square Service Process','Secure Submission Portal'],c:0,e:'<strong>SSP = Square Secure Profile</strong>. Used to request docs/info from sellers during review.',ref:'§5.0'},
+  {tag:'Definitions',sc:null,q:'A Beneficial Owner owns what minimum percentage of the business?',a:['10%','20%','25%','50%'],c:2,e:'A <strong>Beneficial Owner</strong> is anyone who owns <strong>25% or more</strong> of the legal entity, plus one Business Manager.',ref:'§5.0'},
+  {tag:'Definitions',sc:null,q:'Which of these is NOT a type of TIN?',a:['EIN','SSN','ITIN','IDV'],c:3,e:'<strong>IDV = Identity Verification</strong>, not a TIN. TINs include EINs, SSNs, and ITINs.',ref:'§5.0'},
+  {tag:'SLA',sc:null,q:'Internal SLA for new loan application review (cases before 5PM)?',a:['1 business day','2 business days','3 business days','5 business days'],c:1,e:'Internal SLA = <strong>2 business days</strong>. External SLA is 3, but we aim for 2.',ref:'§7.1'},
+  {tag:'SLA',sc:null,q:'Square Loan applications auto-expire after how many calendar days?',a:['7','10','15','30'],c:2,e:'Applications expire after <strong>15 calendar days</strong> if not approved, declined, or extended.',ref:'§7.2'},
+  {tag:'SLA',sc:'An SSP is sent on Day 9 of an application.',q:'The application window now extends until which day?',a:['Day 15','Day 18','Day 21','Day 30'],c:2,e:'SSPs sent on Days 8–14 extend the window by 7 days from expiration, to <strong>Day 21</strong>.',ref:'§7.2'},
+  {tag:'Compliance',sc:'Applicant name is "Jim Tanner." Square account owner is "James Tanner."',q:'How should this name discrepancy be classified?',a:['Complete Mismatch','Single Variance Mismatch','SSN Token Mismatch','TIN Mismatch'],c:1,e:'Jim vs. James is a <strong>Single Variance Mismatch</strong> — a minor nickname variation.',ref:'§8.1.1'},
+  {tag:'Compliance',sc:null,q:'What tool should be checked FIRST to resolve a slight name mismatch?',a:['LexisNexis','Secretary of State website','TLO2 > Names','Google Maps'],c:2,e:'For name mismatches, first check <strong>TLO2 > Names</strong>. If both names appear, manually approve.',ref:'§8.1.1'},
+  {tag:'Compliance',sc:'Google Maps search shows only a red pin drop for the business address.',q:'What is the correct action?',a:['Approve as valid','Decline immediately','Send Business Address Confirmation (Doc) SSP','Update address to pin location'],c:2,e:'A <strong>red pin drop only</strong> (no image) requires sending the <strong>Business Address Confirmation Doc SSP</strong>.',ref:'§8.1.2'},
+  {tag:'Compliance',sc:'A seller provides an invalid address for the 3rd time.',q:'What should the agent do?',a:['Send one more SSP','Decline for 0 days — Business Verification Failure','Decline for 90 days','Escalate to Lead'],c:1,e:'After <strong>3 invalid address attempts</strong>, decline for <strong>0 days</strong> — Business Verification Failure.',ref:'§8.1.2'},
+  {tag:'IDV',sc:'A merchant submits a W2 (starred doc) to verify their failing SSN.',q:'What should the agent request next?',a:['Manually approve IDV','Request SSN card or ITIN letter (SSN Fail 2)','Request a driver\'s license','Decline — starred docs are never valid'],c:1,e:'<strong>Starred docs cannot bypass IDV blockers.</strong> If a starred SSN doc matches the failing SSN, request an SSN card or ITIN letter via SSN Fail 2.',ref:'§8.2.2'},
+  {tag:'IDV',sc:null,q:'Do Beneficial Owners go through the Instant IDV process?',a:['Yes, same as applicants','Yes, but only for Flex products','No — BOs do NOT go through Instant IDV','Only if they own more than 50%'],c:2,e:'<strong>Instant IDV only applies to Flex applicants.</strong> BOs do NOT go through Instant IDV.',ref:'§8.2.1'},
+  {tag:'IDV',sc:null,q:'Which country\'s passport CANNOT be accepted for DOB verification?',a:['Mexico','Canada','Cuba','Brazil'],c:2,e:'Passports from <strong>Cuba, Iran, North Korea, Sudan, or Syria</strong> cannot be accepted.',ref:'§11.2'},
+  {tag:'IDV',sc:'Applicant is flagged as possibly Deceased. Documents MATCH the application.',q:'What is the next step?',a:['Manually approve the blocker','Decline for 90 days immediately','Escalate to Deceased Merchant DRI (Jonathan Orozco)','Escalate directly to FinCrimes'],c:2,e:'When documents MATCH the application on a Deceased flag, <strong>escalate to DRI Jonathan Orozco</strong> for confirmation.',ref:'§8.2.4'},
+  {tag:'TIN',sc:'Merchant applied as LLC but submitted a Form 1040 Schedule C.',q:'What should the agent consider?',a:['Decline — LLC can\'t use Schedule C','Auto-approve — Schedule C overrides TIN','This could be a Single Member LLC (SMLLC)','Request Name Mismatch SSPs'],c:2,e:'LLC + Schedule C = possible <strong>Single Member LLC (SMLLC)</strong>. Follow SMLLC procedures.',ref:'§8.3.1'},
+  {tag:'TIN',sc:'SS-4 letter was issued 10 days ago and TIN still fails the automated check.',q:'What can the agent do?',a:['Decline for Business Verification Failure','Request TIN Fail 1 again','Manually approve TIN — IRS likely hasn\'t updated yet','Escalate to Lead'],c:2,e:'SS-4 issued <strong>within 2 weeks</strong> of review = IRS may not have updated DB. <strong>Manually approve TIN.</strong>',ref:'§8.3'},
+  {tag:'Adverse Actions',sc:null,q:'What is the decline timeframe for a Terms of Service violation?',a:['30 days','60 days','90 days','Permanent'],c:2,e:'Terms of Service violation = <strong>90-day decline</strong>.',ref:'§8.10.1'},
+  {tag:'Adverse Actions',sc:null,q:'A confirmed tax-exempt nonprofit applies. What is the decline timeframe?',a:['90 days','180 days','1 year','Permanent'],c:3,e:'Tax-exempt organizations (nonprofits) are <strong>permanently declined</strong>. AAN: Non Profit.',ref:'§8.2.5'},
+  {tag:'Escalation',sc:null,q:'Which Slack channel handles suspected Account Takeover (ATO) cases?',a:['#compliance','#sfs-ato','#sfs-pre-orig-esc','#global-loans-prod-server'],c:1,e:'ATO cases → <strong>#sfs-ato</strong>. Do NOT add #ATO to the customer\'s Regulator profile.',ref:'§7.3'},
+  {tag:'Escalation',sc:null,q:'To leave a comment on an escalated case WITHOUT closing it, use:',a:['Combos > Close And Comment','Combos > Decline and Close','Edit Case > Comment on Case','Actions > Approve All SSP Responses'],c:2,e:'Use <strong>Edit Case > Comment on Case</strong> (or hotkey "O"). Never use "Close And Comment" on cases you need to keep open.',ref:'§8.9'},
+];
+
+// ═══════════════════════════════════════════════════════════
+// BLITZ STATE
+// ═══════════════════════════════════════════════════════════
+let bIdx=0, bStreak=0, bXP=0, bTimer=null, bAnswered=false, bQuestions=[];
+
+function shuffleArr(a){const r=[...a];for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]]}return r}
+
+function startBlitz(){
+  G.mode='blitz'; bIdx=0; bStreak=0; bXP=0; bAnswered=false;
+  bQuestions = shuffleArr(BLITZ_Q);
+  showScreen('s-blitz'); renderBlitz();
+}
+
+function renderBlitz(){
+  if(bIdx>=bQuestions.length){endBlitz();return}
+  const q=bQuestions[bIdx]; bAnswered=false;
+  document.getElementById('blitz-qnum').textContent=`Q${bIdx+1}/${bQuestions.length}`;
+  document.getElementById('blitz-mod').textContent=q.tag;
+  document.getElementById('blitz-prog').style.width=`${(bIdx/bQuestions.length)*100}%`;
+  document.getElementById('blitz-streak').textContent=bStreak;
+  document.getElementById('blitz-xp').textContent=bXP;
+  document.getElementById('blitz-tag').textContent=q.tag;
+  const sc=document.getElementById('blitz-scenario');
+  if(q.sc){sc.style.display='block';sc.textContent=q.sc}else sc.style.display='none';
+  document.getElementById('blitz-q').textContent=q.q;
+  // shuffle answers
+  const idxArr=shuffleArr([0,1,2,3]);
+  const newCorrect=idxArr.indexOf(q.c);
+  const grid=document.getElementById('blitz-ans');
+  grid.innerHTML='';
+  ['A','B','C','D'].forEach((ltr,pos)=>{
+    const origIdx=idxArr[pos];
+    const btn=document.createElement('button');
+    btn.className='ans-btn';
+    btn.innerHTML=`<span class="ltr">${ltr}</span><span>${q.a[origIdx]}</span>`;
+    btn.dataset.orig=origIdx;
+    btn.onclick=()=>handleBlitz(btn,origIdx===q.c,q);
+    grid.appendChild(btn);
+  });
+  document.getElementById('blitz-fb').style.display='none';
+  document.getElementById('blitz-fb').className='fb-box';
+  document.getElementById('blitz-next').style.display='none';
+  startTimer();
+}
+
+let timerVal=20, timerInterval=null;
+function startTimer(){
+  clearInterval(timerInterval); timerVal=20;
+  updateTimerRing(20);
+  timerInterval=setInterval(()=>{
+    timerVal--;
+    updateTimerRing(timerVal);
+    if(timerVal<=0){clearInterval(timerInterval);timeOut();}
+  },1000);
+}
+
+function updateTimerRing(v){
+  const circ=document.getElementById('timer-circle');
+  const num=document.getElementById('timer-num');
+  const pct=v/20; const dash=163;
+  circ.style.strokeDashoffset=`${dash-(dash*pct)}`;
+  circ.style.stroke=v>10?'var(--cyan)':v>5?'var(--amber)':'var(--red)';
+  num.textContent=v;
+  num.style.color=v>10?'var(--text)':v>5?'var(--amber)':'var(--red)';
+}
+
+function timeOut(){
+  if(bAnswered)return; bAnswered=true; bStreak=0;
+  document.getElementById('blitz-streak').textContent=bStreak;
+  document.querySelectorAll('#blitz-ans .ans-btn').forEach(b=>b.disabled=true);
+  const q=bQuestions[bIdx];
+  document.querySelectorAll('#blitz-ans .ans-btn').forEach(b=>{if(parseInt(b.dataset.orig)===q.c)b.classList.add('correct')});
+  showBlitzFB(false,`⏰ Time's up! The correct answer was highlighted above.<br>${q.e} <span class="sop-tag">${q.ref}</span>`);
+  flash('rgba(239,68,68,0.3)');
+  document.getElementById('blitz-next').style.display='block';
+}
+
+function handleBlitz(btn,correct,q){
+  if(bAnswered)return; bAnswered=true;
+  clearInterval(timerInterval);
+  document.querySelectorAll('#blitz-ans .ans-btn').forEach(b=>b.disabled=true);
+  if(correct){
+    btn.classList.add('correct'); bStreak++;
+    const mult=bStreak>=5?3:bStreak>=3?2:1;
+    const pts=10*mult; bXP+=pts;
+    document.getElementById('blitz-streak').textContent=bStreak;
+    document.getElementById('blitz-xp').textContent=bXP;
+    const fireEl=document.querySelector('.gh-streak .fire');
+    if(fireEl){fireEl.classList.toggle('fire-hot',bStreak>=3)}
+    flash('rgba(16,185,129,0.25)');
+    floatXP(pts,'#10b981',mult>1?mult:null);
+    const multMsg=mult>1?` <strong>${mult}x STREAK BONUS!</strong> +${pts} XP`:`+${pts} XP`;
+    showBlitzFB(true,`${q.e} <span class="sop-tag">${q.ref}</span><br><em>${multMsg}</em>`);
+  } else {
+    btn.classList.add('wrong'); bStreak=0;
+    document.getElementById('blitz-streak').textContent=bStreak;
+    document.querySelectorAll('#blitz-ans .ans-btn').forEach(b=>{if(parseInt(b.dataset.orig)===q.c)b.classList.add('correct')});
+    flash('rgba(239,68,68,0.25)');
+    showBlitzFB(false,`${q.e} <span class="sop-tag">${q.ref}</span>`);
+  }
+  document.getElementById('blitz-next').style.display='block';
+}
+
+function showBlitzFB(ok,html){
+  const fb=document.getElementById('blitz-fb');
+  fb.style.display='block'; fb.className='fb-box '+(ok?'ok':'bad');
+  document.getElementById('blitz-fb-title').textContent=ok?'Correct! ✓':'Not quite...';
+  document.getElementById('blitz-fb-text').innerHTML=html;
+}
+
+function blitzNext(){bIdx++;renderBlitz()}
+
+function endBlitz(){
+  G.blitzXP=bXP; G.totalXP+=bXP;
+  const correct=bQuestions.filter((_,i)=>true).length; // just show XP
+  showRound('⚡','Blitz Quiz Complete!',`You earned <strong>${bXP} XP</strong> across 20 questions.`,bXP,
+    [{label:'Questions',val:bQuestions.length},{label:'Max Streak',val:bStreak},{label:'XP Earned',val:bXP}]);
+}
+
+// ═══════════════════════════════════════════════════════════
+// 🔗 MATCH MASTER DATA
+// ═══════════════════════════════════════════════════════════
+const MATCH_ROUNDS=[
+  {title:'Round 1 — Abbreviations & Definitions',pairs:[
+    ['SSP','Square Secure Profile'],
+    ['BO','Beneficial Owner'],
+    ['TIN','Taxpayer Identification Number'],
+    ['IDV','Identity Verification'],
+    ['EIN','Employer Identification Number'],
+    ['DOB','Date of Birth'],
+  ]},
+  {title:'Round 2 — AANs & Decline Timeframes',pairs:[
+    ['Terms of Service','90 days'],
+    ['Cash Advancing — 2nd Offense','Permanent'],
+    ['Non Profit','Permanent — Tax Exempt'],
+    ['Business Verification Failure','0, 90 days, or Permanent'],
+    ['Deceased','90 days'],
+    ['Insufficient Information','10 days'],
+  ]},
+  {title:'Round 3 — Scenarios & Correct Actions',pairs:[
+    ['Google Maps shows red pin drop only','Send Business Address Confirmation Doc SSP'],
+    ['SS-4 issued within last 2 weeks','Manually approve TIN — IRS not updated yet'],
+    ['Starred SSN document submitted','Request SSN card or ITIN letter (SSN Fail 2)'],
+    ['Merchant flagged Deceased, docs match','Escalate to DRI Jonathan Orozco'],
+    ['LLC applied, submitted Schedule C','Possible SMLLC — follow SMLLC procedures'],
+    ['3rd invalid P.O. Box address attempt','Decline for 0 days — Business Verification Failure'],
+  ]},
+];
+
+let mRound=0, mSelected={left:null,right:null}, mMatched=0, mXP=0, mErrors=0;
+
+function startMatch(){
+  G.mode='match'; mRound=0; mXP=0; mErrors=0;
+  showScreen('s-match'); renderMatch();
+}
+
+function renderMatch(){
+  const round=MATCH_ROUNDS[mRound];
+  mSelected={left:null,right:null}; mMatched=0;
+  document.getElementById('match-round-lbl').textContent=`Round ${mRound+1}/3`;
+  document.getElementById('match-topic').textContent=round.title.split('—')[1].trim().split(' ')[0];
+  document.getElementById('match-prog').style.width=`${(mRound/3)*100}%`;
+  document.getElementById('match-title').textContent=round.title;
+  document.getElementById('match-xp').textContent=mXP;
+  document.getElementById('match-count').textContent=0;
+  document.getElementById('match-total').textContent=round.pairs.length;
+
+  const lefts=shuffleArr(round.pairs.map(p=>p[0]));
+  const rights=shuffleArr(round.pairs.map(p=>p[1]));
+
+  function makeCard(text,side,pairIdx){
+    const card=document.createElement('div');
+    card.className='match-card';
+    card.textContent=text;
+    card.dataset.side=side; card.dataset.text=text;
+    // find correct pair
+    const pairKey=side==='left'?round.pairs.findIndex(p=>p[0]===text):round.pairs.findIndex(p=>p[1]===text);
+    card.dataset.pair=pairKey;
+    card.onclick=()=>clickMatchCard(card,round);
+    return card;
+  }
+
+  const leftCol=document.getElementById('match-left');
+  const rightCol=document.getElementById('match-right');
+  leftCol.innerHTML=''; rightCol.innerHTML='';
+  lefts.forEach(t=>leftCol.appendChild(makeCard(t,'left')));
+  rights.forEach(t=>rightCol.appendChild(makeCard(t,'right')));
+}
+
+function clickMatchCard(card,round){
+  if(card.classList.contains('matched'))return;
+  const side=card.dataset.side;
+  if(mSelected[side]===card){card.classList.remove('selected');mSelected[side]=null;return}
+  if(mSelected[side]){mSelected[side].classList.remove('selected')}
+  mSelected[side]=card; card.classList.add('selected');
+  if(mSelected.left&&mSelected.right){
+    const lp=parseInt(mSelected.left.dataset.pair);
+    const rp=parseInt(mSelected.right.dataset.pair);
+    if(lp===rp){
+      // correct
+      [mSelected.left,mSelected.right].forEach(c=>{c.classList.remove('selected');c.classList.add('matched');c.onclick=null});
+      mMatched++; mXP+=15;
+      document.getElementById('match-count').textContent=mMatched;
+      document.getElementById('match-xp').textContent=mXP;
+      flash('rgba(16,185,129,0.2)');
+      floatXP(15,'#06b6d4');
+      mSelected={left:null,right:null};
+      if(mMatched===round.pairs.length){
+        setTimeout(()=>{
+          mRound++;
+          if(mRound>=MATCH_ROUNDS.length) endMatch();
+          else renderMatch();
+        },700);
+      }
+    } else {
+      // wrong
+      mErrors++;
+      [mSelected.left,mSelected.right].forEach(c=>{c.classList.add('wrong-flash');c.classList.remove('selected')});
+      flash('rgba(239,68,68,0.2)');
+      setTimeout(()=>[mSelected.left,mSelected.right].forEach(c=>c.classList.remove('wrong-flash')),400);
+      mSelected={left:null,right:null};
+    }
+  }
+}
+
+function endMatch(){
+  G.matchXP=mXP; G.totalXP+=mXP;
+  showRound('🔗','Match Master Complete!',`All 3 rounds cleared! You earned <strong>${mXP} XP</strong>.`,mXP,
+    [{label:'Rounds',val:3},{label:'Errors',val:mErrors},{label:'XP Earned',val:mXP}]);
+}
+
+// ═══════════════════════════════════════════════════════════
+// 🗂️ SORT SQUAD DATA
+// ═══════════════════════════════════════════════════════════
+const SORT_BUCKETS=[
+  {id:'compliance',icon:'📋',name:'Compliance Fail',color:'var(--purple)'},
+  {id:'idv',icon:'🪪',name:'IDV Fail',color:'var(--cyan)'},
+  {id:'tin',icon:'🧾',name:'TIN Fail',color:'var(--amber)'},
+];
+
+const SORT_CARDS=[
+  {text:'Application and Customer Names Do Not Match',cat:'compliance',explain:'Name mismatch is a Compliance fail'},
+  {text:'P.O. Box detected as business address',cat:'compliance',explain:'Address/P.O. Box is a Compliance fail'},
+  {text:'Bank account could not be verified',cat:'compliance',explain:'Bank Account Verification is a Compliance fail'},
+  {text:'No Match For Applicant SSN during ID check',cat:'idv',explain:'Applicant SSN failure is an IDV fail'},
+  {text:'No Match For Applicant Date of Birth',cat:'idv',explain:'Applicant DOB failure is an IDV fail'},
+  {text:'Beneficial Owner\'s name does not match records',cat:'idv',explain:'BO name failure is an IDV fail'},
+  {text:'Applicant is flagged as possibly Deceased',cat:'idv',explain:'Deceased flag falls under IDV fails'},
+  {text:'Business is confirmed as a Tax-Exempt Nonprofit',cat:'idv',explain:'Nonprofit merchants are handled under IDV section (§8.2.5)'},
+  {text:'TIN Name Mismatch — business name doesn\'t match IRS records',cat:'tin',explain:'TIN Name Mismatch is a TIN fail'},
+  {text:'Merchant applied as LLC, submitted Schedule C (possible SMLLC)',cat:'tin',explain:'SMLLC verification falls under TIN fails'},
+  {text:'SS-4 confirmation letter provided but TIN still fails check',cat:'tin',explain:'SS-4 review is part of TIN fail procedure'},
+  {text:'Home address listed as General Delivery',cat:'compliance',explain:'General Delivery addresses are handled under Compliance/Address validation'},
+];
+
+let sIdx=0, sXP=0, sCorrect=0, sCards=[], sFbTimer=null;
+
+function startSort(){
+  G.mode='sort'; sIdx=0; sXP=0; sCorrect=0;
+  sCards=shuffleArr(SORT_CARDS);
+  // render buckets
+  const bucketsEl=document.getElementById('sort-buckets');
+  bucketsEl.innerHTML='';
+  SORT_BUCKETS.forEach(b=>{
+    const div=document.createElement('div');
+    div.className='bucket'; div.id='bucket-'+b.id;
+    div.innerHTML=`<div class="bucket-icon">${b.icon}</div><div class="bucket-name">${b.name}</div><div class="bucket-count" id="bcount-${b.id}">0 sorted</div>`;
+    div.style.borderColor=b.color+'44';
+    bucketsEl.appendChild(div);
+  });
+  // render buttons
+  const btnsEl=document.getElementById('sort-btns');
+  btnsEl.innerHTML='';
+  SORT_BUCKETS.forEach(b=>{
+    const btn=document.createElement('button');
+    btn.className='sort-btn'; btn.dataset.cat=b.id;
+    btn.innerHTML=`${b.icon} ${b.name}`;
+    btn.style.setProperty('--hcolor',b.color);
+    btn.onclick=()=>handleSort(b.id);
+    btnsEl.appendChild(btn);
+  });
+  showScreen('s-sort'); renderSortCard();
+}
+
+const bucketCounts={compliance:0,idv:0,tin:0};
+
+function renderSortCard(){
+  if(sIdx>=sCards.length){endSort();return}
+  const card=sCards[sIdx];
+  document.getElementById('sort-num').textContent=`Card ${sIdx+1}/${sCards.length}`;
+  document.getElementById('sort-prog').style.width=`${(sIdx/sCards.length)*100}%`;
+  document.getElementById('sort-card-text').textContent=card.text;
+  document.getElementById('sort-fb').textContent='';
+  document.getElementById('sort-xp').textContent=sXP;
+}
+
+function handleSort(cat){
+  const card=sCards[sIdx];
+  const correct=cat===card.cat;
+  const fb=document.getElementById('sort-fb');
+  const bucket=document.getElementById('bucket-'+cat);
+  clearTimeout(sFbTimer);
+  if(correct){
+    sCorrect++; sXP+=10;
+    bucket.classList.add('correct-drop');
+    bucketCounts[cat]=(bucketCounts[cat]||0)+1;
+    document.getElementById('bcount-'+cat).textContent=`${bucketCounts[cat]} sorted`;
+    fb.style.color='var(--green)';
+    fb.textContent=`✓ Correct! ${card.explain}`;
+    flash('rgba(16,185,129,0.2)');
+    floatXP(10,'#10b981');
+  } else {
+    bucket.classList.add('wrong-drop');
+    const correctBucket=SORT_BUCKETS.find(b=>b.id===card.cat);
+    fb.style.color='var(--red)';
+    fb.textContent=`✗ That belongs in "${correctBucket.name}" — ${card.explain}`;
+    flash('rgba(239,68,68,0.2)');
+  }
+  setTimeout(()=>{
+    bucket.classList.remove('correct-drop','wrong-drop');
+    sIdx++; renderSortCard();
+  },900);
+}
+
+function endSort(){
+  G.sortXP=sXP; G.totalXP+=sXP;
+  showRound('🗂️','Sort Squad Complete!',`Sorted all 12 scenarios! You got <strong>${sCorrect}/12</strong> correct.`,sXP,
+    [{label:'Correct',val:`${sCorrect}/12`},{label:'Accuracy',val:`${Math.round(sCorrect/12*100)}%`},{label:'XP Earned',val:sXP}]);
+}
+
+// ═══════════════════════════════════════════════════════════
+// 🕵️ CASE CRACKER DATA
+// ═══════════════════════════════════════════════════════════
+const CASES=[
+  {
+    title:'Case #1 — Sunrise Bakery LLC',
+    badge:'Name Mismatch Review',
+    detail:`Applicant: <strong>Sara Moreno</strong> | Account Owner: <strong>Sarah Moreno</strong><br>
+    Blocker: <em>Application And Customer Names Do Not Match</em><br>
+    Product: Flex Loan | Submitted: Day 3`,
+    steps:[
+      {num:'Step 1',q:'What type of name discrepancy is "Sara" vs "Sarah"?',
+       choices:['Complete Mismatch — treat as different people','Single Variance Mismatch — minor spelling variation','SSN Token Mismatch','TIN Name Mismatch'],
+       correct:1,result:'Sara vs. Sarah is a <strong>Single Variance Mismatch</strong>. First check <strong>TLO2 > Names</strong> to see if both names appear. (§8.1.1)'},
+      {num:'Step 2',q:'TLO2 shows both "Sara Moreno" and "Sarah Moreno" in the report for the same individual. What do you do?',
+       choices:['Send Name Mismatch 1 and 2 SSPs','Request driver\'s license for name verification','Manually approve the Compliance blocker and close the case','Escalate to Pre-Origination Lead'],
+       correct:2,result:'TLO2 confirms both names belong to the same person. <strong>Manually approve the blocker and close the case</strong>. (§8.1.1)'},
+      {num:'Step 3 — Approval Action (Flex)',q:'What is the correct Regulator combo action to approve this Compliance blocker in Flex?',
+       choices:['Combos > Approve Compliance Review Application Step and Close → Select "AO & Applicant"','Combos > Decline Compliance Review Application Step and Close','Actions > Approve All SSP Responses','Combos > Create Capital Compliance SSP and Mark Pending'],
+       correct:0,result:'For Flex: <strong>Combos → Approve Compliance Review Application Step and Close</strong>, then select "AO & Applicant." (§8.1.1)'},
+    ]
+  },
+  {
+    title:'Case #2 — Metro Auto Repair',
+    badge:'Bank Account Verification',
+    detail:`Blocker: <em>Applicant Bank Account Is Verified</em><br>
+    Product: STL | Business Type: LLC | Submitted: Day 5<br>
+    Seller linked a new bank account the day before applying.`,
+    steps:[
+      {num:'Step 1',q:'The seller\'s linked account is through Sutton Bank, NOT Square Checking. What is your first action?',
+       choices:['Manually approve Compliance — Sutton Bank is fine','Decline — only Square Checking accounts are accepted','Request most recent bank statement (issued within last 6 months) showing name and last 3 account digits','Escalate to #sfs-ato'],
+       correct:2,result:'Since it\'s not a Square Checking account, proceed to Step 2: verify the <strong>most recent bank statement (within 6 months)</strong> showing business name, account owner, and last 3 digits. (§8.1.3)'},
+      {num:'Step 2',q:'The seller responds with a bank statement. It shows the business name and account number, but the statement is 8 months old. What do you do?',
+       choices:['Accept it — the name and account number match','Reject the SSP — statement must be within last 6 months','Decline for Business Verification Failure permanently','Manually approve — older statements are allowed for STL'],
+       correct:1,result:'<strong>Reject the SSP</strong> — bank statements must be issued <strong>within the last 6 months</strong>. Continue rejecting until the seller provides a current statement. (§8.1.3)'},
+      {num:'Step 3',q:'The seller banks with a credit union and says their statement doesn\'t show the last 3 digits of the account. What is the correct response?',
+       choices:['Accept the statement — credit unions are exempt from showing account digits','Send a freeform Doc SSP requesting a voided check, credit union letter, or app screenshot showing last 3 digits','Decline immediately for Business Verification Failure','Request TIN Fail 1 documentation'],
+       correct:1,result:'Credit union members may lack digits on statements. Send a <strong>freeform Doc SSP</strong> requesting a voided check, letter from the credit union, or a screenshot showing the last 3 digits. (§8.1.3)'},
+    ]
+  },
+  {
+    title:'Case #3 — Bright Minds Tutoring LLC',
+    badge:'TIN Fail / SMLLC',
+    detail:`Blocker: <em>TIN Name Mismatch</em><br>
+    Product: Flex | Entity Type: LLC | Submitted: Day 2<br>
+    Seller submitted a Form 1040 Schedule C showing owner: Emily Chen, business: Bright Minds Tutoring, no EIN listed.`,
+    steps:[
+      {num:'Step 1',q:'The merchant applied as an LLC but submitted a Schedule C with no EIN. What should you consider?',
+       choices:['Decline — LLC applicants must have an EIN','Request the SS-4 letter immediately (TIN Fail 2)','This is likely a Single Member LLC (SMLLC) — follow SMLLC procedures','Escalate to Compliance'],
+       correct:2,result:'LLC + Schedule C without EIN = likely <strong>Single Member LLC (SMLLC)</strong>. Follow the SMLLC procedures in §8.3.1.'},
+      {num:'Step 2',q:'The Schedule C shows the business name matches the application AND the owner\'s SSN is listed as the business TIN. What can you do?',
+       choices:['Send Single Member Confirmation (TEXT) SSP first','Manually approve the TIN blocker — SSN on Schedule C is sufficient verification','Decline — SSN cannot be used as a business TIN','Request Articles of Incorporation'],
+       correct:1,result:'If business names match and the <strong>SSN is used as the business TIN on both the app and Schedule C</strong>, manually approve the TIN blocker using the Schedule C. (§8.3.1)'},
+      {num:'Step 3 — Approval Action (Flex)',q:'What is the correct Flex action to manually approve the TIN blocker?',
+       choices:['Combos > Create Manual TIN Application Step and Close → Select "TIN Confirmed" → Document: 1040 Schedule C','Combos > Approve Compliance Review Application Step and Close','Actions > Update Application Data','Combos > Decline Compliance Review Application Step and Close'],
+       correct:0,result:'For Flex TIN approval: <strong>Combos → Create Manual TIN Application Step and Close → TIN Confirmed → Document: 1040 Schedule C</strong>. (§8.3.1)'},
+    ]
+  }
+];
+
+let caseIdx=0, caseXP=0, caseStepIdx=0, caseAnswered=false;
+
+function startCase(){
+  G.mode='case'; caseIdx=0; caseXP=0; caseStepIdx=0;
+  showScreen('s-case'); renderCase();
+}
+
+function renderCase(){
+  if(caseIdx>=CASES.length){endCase();return}
+  const cas=CASES[caseIdx];
+  document.getElementById('case-prog-lbl').textContent=`Case ${caseIdx+1}/3`;
+  document.getElementById('case-prog-fill').style.width=`${(caseIdx/3)*100}%`;
+  document.getElementById('case-xp').textContent=caseXP;
+  caseStepIdx=0;
+  const content=document.getElementById('case-content');
+  content.innerHTML=`
+    <div class="case-header">
+      <div class="case-badge">🕵️ ${cas.badge}</div>
+      <div class="case-title">${cas.title}</div>
+      <div class="case-detail">${cas.detail}</div>
+    </div>
+    <div id="case-steps"></div>
+  `;
+  renderCaseStep();
+}
+
+function renderCaseStep(){
+  const cas=CASES[caseIdx];
+  if(caseStepIdx>=cas.steps.length){
+    setTimeout(()=>{caseIdx++;renderCase()},600);
+    return;
+  }
+  const step=cas.steps[caseStepIdx];
+  const stepsEl=document.getElementById('case-steps');
+  const stepDiv=document.createElement('div');
+  stepDiv.className='case-step'; stepDiv.id=`step-${caseStepIdx}`;
+  const shuffled=shuffleArr([0,1,2,3]);
+  const newCorrect=shuffled.indexOf(step.correct);
+  const choicesHTML=shuffled.map((origIdx,pos)=>`
+    <button class="case-btn" data-orig="${origIdx}" onclick="handleCaseStep(this,${origIdx===step.correct},${caseStepIdx})">
+      ${['A','B','C','D'][pos]}. ${step.choices[origIdx]}
+    </button>
+  `).join('');
+  stepDiv.innerHTML=`
+    <div class="case-step-num">${step.num}</div>
+    <div class="case-q">${step.q}</div>
+    <div class="case-choices">${choicesHTML}</div>
+    <div class="case-result" id="case-result-${caseStepIdx}"></div>
+  `;
+  stepsEl.appendChild(stepDiv);
+  stepDiv.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function handleCaseStep(btn,correct,stepIdx){
+  const cas=CASES[caseIdx];
+  const step=cas.steps[stepIdx];
+  btn.classList.add('chosen',correct?'right':'wrong');
+  btn.closest('.case-choices').querySelectorAll('.case-btn').forEach(b=>b.disabled=true);
+  if(correct){caseXP+=20;flash('rgba(16,185,129,0.2)');floatXP(20,'#f59e0b')}
+  else{flash('rgba(239,68,68,0.2)')}
+  document.getElementById('case-xp').textContent=caseXP;
+  const result=document.getElementById(`case-result-${stepIdx}`);
+  result.innerHTML=`${correct?'✅':'❌'} ${step.result}`;
+  result.classList.add('show');
+  setTimeout(()=>{caseStepIdx++;renderCaseStep()},1200);
+}
+
+function endCase(){
+  G.caseXP=caseXP; G.totalXP+=caseXP;
+  showRound('🕵️','Case Cracker Complete!',`All 3 cases solved! You earned <strong>${caseXP} XP</strong>.`,caseXP,
+    [{label:'Cases Solved',val:3},{label:'Decisions',val:9},{label:'XP Earned',val:caseXP}]);
+}
+
+// ═══════════════════════════════════════════════════════════
+// ROUND COMPLETE
+// ═══════════════════════════════════════════════════════════
+let roundNextFn=null;
+
+function showRound(icon,title,sub,xp,stats){
+  launchConfetti();
+  document.getElementById('round-icon').textContent=icon;
+  document.getElementById('round-title').textContent=title;
+  document.getElementById('round-sub').innerHTML=sub;
+  document.getElementById('round-val').textContent=xp;
+  const statsEl=document.getElementById('round-stats');
+  statsEl.innerHTML=stats.map(s=>`<div class="stat-pill"><div class="sv">${s.val}</div><div class="sl">${s.label}</div></div>`).join('');
+  const ring=document.getElementById('round-ring');
+  ring.style.borderColor='var(--green)';
+  showScreen('s-round');
+  // set next
+  if(G.mode==='all'){
+    const seq=['blitz','match','sort','case','final'];
+    const cur=seq.indexOf(G.currentGame||'');
+    const next=seq[cur+1];
+    roundNextFn=next==='final'?showFinal:()=>startGameByName(next);
+    document.getElementById('round-next-btn').textContent=next==='final'?'See Final Results →':'Next Game →';
+  } else {
+    roundNextFn=showFinal;
+    document.getElementById('round-next-btn').textContent='See Results →';
+  }
+}
+
+function roundNext(){if(roundNextFn)roundNextFn()}
+
+function startGameByName(name){
+  if(name==='blitz')startBlitz();
+  else if(name==='match')startMatch();
+  else if(name==='sort')startSort();
+  else if(name==='case')startCase();
+}
+
+// Override game starters to set currentGame
+const _startBlitz=startBlitz, _startMatch=startMatch, _startSort=startSort, _startCase=startCase;
+function startBlitz(){G.currentGame='blitz';_startBlitz&&(bIdx=0,bStreak=0,bXP=0,bAnswered=false,bQuestions=shuffleArr(BLITZ_Q),showScreen('s-blitz'),renderBlitz())}
+function startMatch(){G.currentGame='match';mRound=0;mXP=0;mErrors=0;showScreen('s-match');renderMatch()}
+function startSort(){
+  G.currentGame='sort';sIdx=0;sXP=0;sCorrect=0;
+  sCards=shuffleArr(SORT_CARDS);
+  Object.keys(bucketCounts).forEach(k=>bucketCounts[k]=0);
+  const bucketsEl=document.getElementById('sort-buckets');
+  bucketsEl.innerHTML='';
+  SORT_BUCKETS.forEach(b=>{
+    const div=document.createElement('div');
+    div.className='bucket'; div.id='bucket-'+b.id;
+    div.innerHTML=`<div class="bucket-icon">${b.icon}</div><div class="bucket-name">${b.name}</div><div class="bucket-count" id="bcount-${b.id}">0 sorted</div>`;
+    div.style.borderColor=b.color+'44';
+    bucketsEl.appendChild(div);
+  });
+  const btnsEl=document.getElementById('sort-btns');
+  btnsEl.innerHTML='';
+  SORT_BUCKETS.forEach(b=>{
+    const btn=document.createElement('button');
+    btn.className='sort-btn'; btn.dataset.cat=b.id;
+    btn.innerHTML=`${b.icon} ${b.name}`;
+    btn.onclick=()=>handleSort(b.id);
+    btnsEl.appendChild(btn);
+  });
+  showScreen('s-sort'); renderSortCard();
+}
+function startCase(){G.currentGame='case';caseIdx=0;caseXP=0;caseStepIdx=0;showScreen('s-case');renderCase()}
+
+function startAll(){
+  G.mode='all'; G.currentGame='blitz';
+  bIdx=0;bStreak=0;bXP=0;bAnswered=false;bQuestions=shuffleArr(BLITZ_Q);
+  showScreen('s-blitz');renderBlitz();
+}
+
+// ═══════════════════════════════════════════════════════════
+// FINAL SCREEN
+// ═══════════════════════════════════════════════════════════
+function showFinal(){
+  launchConfetti(); launchConfetti();
+  const total=G.totalXP;
+  let trophy,title,badgeTitle,badgeSub;
+  if(total>=600){trophy='🏆';title='SOP Legend';badgeTitle='🏆 Compliance Master';badgeSub='Incredible! You\'ve demonstrated elite-level mastery of the SFS Compliance Review SOP V3. You\'re fully equipped to handle any case.'}
+  else if(total>=450){trophy='⭐';title='Compliance Expert';badgeTitle='⭐ Expert Agent';badgeSub='Outstanding performance! Strong command across all areas. Review any weak spots and you\'re ready to handle real cases.'}
+  else if(total>=300){trophy='✅';title='Compliance Ready';badgeTitle='✅ Certified Reviewer';badgeSub='Good work! You have solid foundational knowledge. Review the sections where you struggled and retake to sharpen up.'}
+  else{trophy='📖';title='Keep Studying';badgeTitle='📖 Trainee Agent';badgeSub='You\'re building your foundation! The SOP is complex — review key sections on IDV, TIN, and Adverse Action Notices, then retake to improve.'}
+
+  document.getElementById('final-trophy').textContent=trophy;
+  document.getElementById('final-title').textContent=title;
+  document.getElementById('final-score').textContent=`${total} XP`;
+  document.getElementById('final-badge-title').textContent=badgeTitle;
+  document.getElementById('final-badge-sub').textContent=badgeSub;
+
+  const bd=document.getElementById('final-breakdown');
+  const games=[{name:'Blitz Quiz',xp:G.blitzXP,icon:'⚡'},{name:'Match Master',xp:G.matchXP,icon:'🔗'},{name:'Sort Squad',xp:G.sortXP,icon:'🗂️'},{name:'Case Cracker',xp:G.caseXP,icon:'🕵️'}];
+  bd.innerHTML=games.map(g=>`<div class="bk-card"><div class="bk-game">${g.icon} ${g.name}</div><div class="bk-pts" style="color:${g.xp>0?'var(--green)':'var(--muted)'}">${g.xp} XP</div></div>`).join('');
+  showScreen('s-final');
+}
+</script>
+<!-- Clippy Helper -->
+
+<script src="clippy-mascot.js"></script>
+</body>
+</html>

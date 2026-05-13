@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>SFS Pre-Origination Training Dashboard</title>
+    <link rel="stylesheet" href="styles.css?v=1778644490">
+</head>
+<body>
+    <div class="app-layout">
+
+        <!-- Left Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-user-card">
+                <div class="suc-avatar" id="suc-avatar">?</div>
+                <div class="suc-name" id="suc-name">loading...</div>
+            </div>
+            <div class="sidebar-search-wrap">
+                <span class="sidebar-search-icon">🔍</span>
+                <input type="text" id="sidebar-search" class="sidebar-search-input" placeholder="Search…" autocomplete="off" />
+                <button class="sidebar-search-clear" id="sidebar-search-clear" title="Clear">✕</button>
+            </div>
+            <!-- Search results overlay -->
+            <div id="search-results-panel" class="search-results-panel" style="display:none;"></div>
+
+            <nav class="sidebar-nav">
+                <button class="sidebar-btn active" data-tab="homepage">
+                    <span class="sidebar-icon">🏠</span>
+                    <span class="sidebar-label">Homepage</span>
+                </button>
+                <button class="sidebar-btn" data-tab="resources">
+                    <span class="sidebar-icon">📚</span>
+                    <span class="sidebar-label">Training Resources</span>
+                </button>
+                <div class="sidebar-dropdown">
+                    <button class="sidebar-btn sidebar-dropdown-toggle" data-tab="schedule">
+                        <span class="sidebar-icon">📅</span>
+                        <span class="sidebar-label">Training Schedules</span>
+                        <span class="sidebar-arrow">▾</span>
+                    </button>
+                    <div class="sidebar-dropdown-menu">
+                        <button class="sidebar-sub-btn" data-tab="schedule-newhire">
+                            <span class="sidebar-sub-icon">🎓</span> New Hire Training Schedule
+                        </button>
+                        <button class="sidebar-sub-btn" data-tab="schedule">
+                            <span class="sidebar-sub-icon">🔁</span> Refresher Training Schedule
+                        </button>
+                    </div>
+                </div>
+                <button class="sidebar-btn" data-tab="ssp">
+                    <span class="sidebar-icon">📝</span>
+                    <span class="sidebar-label">When To SSP?</span>
+                </button>
+                <div class="sidebar-dropdown">
+                    <button class="sidebar-btn sidebar-dropdown-toggle" data-tab="simulator-compliance-flex">
+                        <span class="sidebar-icon">🎯</span>
+                        <span class="sidebar-label">Case Simulator</span>
+                        <span class="sidebar-arrow">▾</span>
+                    </button>
+                    <div class="sidebar-dropdown-menu">
+                        <button class="sidebar-sub-btn" data-tab="simulator-compliance-flex">
+                            <span class="sidebar-sub-icon">📋</span> Compliance Flex/Term Case Simulator
+                        </button>
+                        <button class="sidebar-sub-btn" data-tab="simulator-compliance-stl">
+                            <span class="sidebar-sub-icon">📋</span> Compliance STL Case Simulator
+                        </button>
+                        <button class="sidebar-sub-btn" data-tab="simulator-risk-flex">
+                            <span class="sidebar-sub-icon">⚠️</span> Risk Flex/Term Case Simulator
+                        </button>
+                        <button class="sidebar-sub-btn" data-tab="simulator-email">
+                            <span class="sidebar-sub-icon">✉️</span> Email Case Simulator
+                        </button>
+                    </div>
+                </div>
+                <button class="sidebar-btn" data-tab="progress">
+                    <span class="sidebar-icon">📊</span>
+                    <span class="sidebar-label">My Progress</span>
+                </button>
+            </nav>
+            <div class="sidebar-review-card">
+                <span class="src-label">Dashboard Last Reviewed:</span>
+                <span class="src-value">Oct '25</span>
+                <span class="src-label">· Next Review: Q3 2026</span>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+
+            <!-- Header -->
+            <header>
+                <h1>🎓 SFS Pre-Origination Training Dashboard</h1>
+                <p class="subtitle">Comprehensive training resources, schedules, and case simulators</p>
+            </header>
+
+            <!-- Homepage Tab -->
+            <div id="homepage" class="tab-content active">
+                <section class="section">
+
+                    <!-- Stats Row -->
+                    <div class="hp-stats-grid">
+                        <div class="hp-stat-card">
+                            <div class="hp-stat-label">TRAININGS DUE</div>
+                            <div class="hp-stat-value" id="stat-due">—</div>
+                            <div class="hp-stat-delta hp-delta-orange" id="stat-due-sub">This quarter</div>
+                        </div>
+                        <!-- Trainings Quick Start -->
+                        <div class="hp-stat-card hp-quickstart-card">
+                            <div class="qs-header-row">
+                                <div class="hp-stat-label">TRAININGS QUICK START</div>
+                                <div id="quickstart-quarter-badge" class="qs-quarter-badge">Q2</div>
+                            </div>
+                            <div id="quickstart-list" class="qs-list">
+                                <span class="qs-empty">No sessions scheduled this quarter</span>
+                            </div>
+                        </div>
+
+                        <div class="hp-stat-card">
+                            <div class="hp-stat-label">TRAININGS IN PROGRESS</div>
+                            <div class="hp-stat-value" id="stat-inprogress">—</div>
+                            <div class="hp-stat-delta hp-delta-teal" id="stat-inprogress-sub">Upcoming this quarter</div>
+                        </div>
+                        <div class="hp-stat-card">
+                            <div class="hp-stat-label">TRAININGS COMPLETED</div>
+                            <div class="hp-stat-value" id="stat-completed">—</div>
+                            <div class="hp-stat-delta hp-delta-teal" id="stat-completed-sub">This quarter</div>
+                        </div>
+
+                    </div>
+
+                    <!-- Two-column grid: Training Highlights + Updates -->
+                    <div class="hp-home-grid">
+
+                        <!-- Left: stacked column with 2 cards -->
+                        <div class="hp-left-col">
+
+                            <!-- Top card: Welcome -->
+                            <div class="hp-card">
+                                <div class="hp-card-title hp-welcome-title">👋 Welcome!</div>
+                                <p class="hp-about-text">Welcome to the <strong class="hp-gradient-text">SFS Pre-Origination Training Dashboard</strong>—your central hub for training schedules, resources, and skill-building! Track your progress, access SOPs and training materials, and sharpen your decision-making with our interactive simulators.</p>
+                            </div>
+
+                            <!-- Bottom row: Who We Are + New Hires side by side -->
+                            <div class="hp-bottom-row">
+                                <div class="hp-card">
+                                    <div class="hp-card-title hp-section-title">🤝 Who We Are</div>
+                                    <p class="hp-about-text">The SFS Pre-Origination Team reviews loan applications that require manual decisioning, helping provide Sellers with access to capital when applications are not auto-approved. The team continuously refines its review processes to balance effective risk management while maintaining a strong Seller experience.</p>
+                                </div>
+                                <div class="hp-card">
+                                    <div class="hp-card-title hp-section-title">🌟 New Hires</div>
+                                    <p class="hp-about-text"></p>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- Right: Updates (dynamic, with + Post Update) -->
+                        <div class="hp-card">
+                            <div class="hp-card-title-row">
+                                <span>🔔 Updates</span>
+                                <button class="hp-post-btn" onclick="openAddUpdateModal()" style="display:none;">+ Post Update</button>
+                            </div>
+                            <div id="updates-list" class="updates-list">
+                                <!-- populated by JS -->
+                            </div>
+                            <div id="updates-empty" class="hp-updates-empty">
+                                <span>🔔</span>
+                                <p>No updates yet. Click <strong>+ Post Update</strong> to add one.</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+            </div>
+
+            <!-- Training Resources Tab -->
+            <div id="resources" class="tab-content">
+                <section class="section">
+                    <h2>📚 Training Resources</h2>
+                    
+                    <div class="resource-grid">
+                        <div class="resource-card">
+                            <h3>📖 Standard Operating Procedures (SOPs)</h3>
+                            <ul class="resource-list">
+                                <li><a href="#" class="resource-link">SFS Square Loan Manual Review Credit Operations SOP V2</a></li>
+                                <li><a href="#" class="resource-link">Square Loan Application Compliance Review Flow SOP V3</a></li>
+                                <li><a href="#" class="resource-link">Square Loans Revised Offers SOP V2</a></li>
+                                <li><a href="#" class="resource-link">Square Loan Eligibility Re-assessment Outside of System Generated Parameters SOP</a></li>
+                                <li><a href="#" class="resource-link">SFS Square Loans | Credit Risk Escalation SOP</a></li>
+                                <li><a href="#" class="resource-link">Short Term Loan (STL) Compliance Application Review [AppOrchard]</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="resource-card">
+                            <h3>🔄 Refreshers &amp; Quizzes</h3>
+                            <ul class="resource-list">
+                                <li>
+                                    <a href="https://docs.google.com/presentation/d/19vXDRnqEJLsxsaCNBwfEzis0drcACyMu74hngDR28RE/edit" target="_blank" class="resource-link">Linked Account Refresher</a>
+                                    <span class="resource-meta"> • Quiz: Evasion Quiz</span>
+                                </li>
+                                <li>
+                                    <a href="https://docs.google.com/presentation/d/1HkvJKYEQn6MQ-rvt6X5UnFYEusrubUU3Y08dRZKOT9w/edit" target="_blank" class="resource-link">CBD Refresher</a>
+                                    <span class="resource-meta"> • Quiz: CBD Quiz</span>
+                                </li>
+                                <li>
+                                    <a href="https://docs.google.com/presentation/d/1eMd_WAdkOyVNQicSP0FlG-TPTRJqSj9qo9zlkhUw6G4/edit" target="_blank" class="resource-link">Large Loan/Liens Refresher</a>
+                                    <span class="resource-meta"> • <a href="https://docs.google.com/forms/d/1AXvaukkwU5euZv6-ZmQF3f912DaHGqdGYL2bwpUc35o/edit" target="_blank" class="quiz-link">Lien Quiz</a></span>
+                                </li>
+                                <li>
+                                    <a href="https://docs.google.com/presentation/d/1GichqLIXPVVXWzQmabvgzEPsO4CbJxbeTSplb3_-rYg/edit" target="_blank" class="resource-link">Credit Risk Refresher</a>
+                                    <span class="resource-meta"> • Quiz: Credit Risk Quiz</span>
+                                </li>
+                                <li>
+                                    <a href="https://docs.google.com/presentation/d/1kbS7p5pB5d3zaqnD9Dwm9GfHdm8y0845--jK-ON1WfE/edit" target="_blank" class="resource-link">Seasonality Refresher</a>
+                                    <span class="resource-meta"> • <a href="https://docs.google.com/forms/d/10Ge9lWTAub3NzgbOasXq6eM0eD1VtY1x2uPUlJgRpDE/edit" target="_blank" class="quiz-link">Seasonality Quiz</a></span>
+                                </li>
+                                <li>
+                                    <a href="https://docs.google.com/presentation/d/1KtD5GlMa9CBkRwuFCCJvB2vWl3xkoe-L9x2fapEiU9Y/edit" target="_blank" class="resource-link">Adverse Account Activity Refresher</a>
+                                    <span class="resource-meta"> • <a href="https://docs.google.com/spreadsheets/d/1pjwYiIUHRoOjNRTSblBuCYhoBjLbMa1vUxjZgj9DC9Q/edit?resourcekey#gid=1291145689" target="_blank" class="quiz-link">Quiz Results</a></span>
+                                </li>
+                                <li>
+                                    <a href="https://docs.google.com/presentation/d/1hGgc83O_wRnu9JnvkAeLyWskMQbTon4-pi13hHI2_zY/edit" target="_blank" class="resource-link">Pre-Origination TOSV Refresher</a>
+                                    <span class="resource-meta"> • Quiz: TOSV Quiz</span>
+                                </li>
+                                <li>
+                                    <a href="https://docs.google.com/presentation/d/1TpRK8lmZWtTNUdy42bMQUG3sQup54eTwWMXuY6GYxN8/edit" target="_blank" class="resource-link">Escalation Pathways Refresher</a>
+                                </li>
+                                <li><a href="#" class="resource-link">Short Term Loans</a></li>
+                                <li><a href="#" class="resource-link">Manual Risk Review Training for Square Loans</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="resource-card">
+                            <h3>🔍 Research &amp; Verification Tools</h3>
+                            <ul class="resource-list">
+                                <li><a href="#" class="resource-link">Secretary of State (SOS) Business Search</a></li>
+                                <li><a href="https://regulator.sqprod.co" target="_blank" class="resource-link">Regulator - Merchant Lookup</a></li>
+                                <li><a href="#" class="resource-link">AppOrchard - Application Review</a></li>
+                                <li><a href="#" class="resource-link">Credit Risk Assessment Tools</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="resource-card">
+                            <h3>🎥 Video Tutorials</h3>
+                            <ul class="resource-list">
+                                <li><a href="#" class="resource-link">Manual Review Process Overview (15 min)</a></li>
+                                <li><a href="#" class="resource-link">Compliance Review Best Practices (20 min)</a></li>
+                                <li><a href="#" class="resource-link">Using Regulator &amp; AppOrchard (25 min)</a></li>
+                                <li><a href="#" class="resource-link">Credit Risk Escalation Process (18 min)</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="resource-card">
+                            <h3>📋 Quick Reference Guides</h3>
+                            <ul class="resource-list">
+                                <li><a href="#" class="resource-link">Manual Review Decision Matrix</a></li>
+                                <li><a href="#" class="resource-link">Compliance Review Checklist</a></li>
+                                <li><a href="#" class="resource-link">Credit Risk Red Flags Guide</a></li>
+                                <li><a href="#" class="resource-link">Escalation Flowchart</a></li>
+                                <li><a href="#" class="resource-link">Revised Offers Quick Guide</a></li>
+                                <li><a href="#" class="resource-link">FAQ - Common Review Scenarios</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- New Hire Training Schedule Tab -->
+            <div id="schedule-newhire" class="tab-content">
+                <section class="section">
+                    <div class="schedule-header-bar">
+                        <h2>New Hire Training Schedule</h2>
+                        <div class="schedule-header-actions">
+                            <span id="nh-sync-status" style="font-size: 0.85rem; color: #666; margin-right: 12px;">Ready to sync</span>
+                            <button class="btn-secondary" onclick="manualSyncNH()" style="display: inline-flex; align-items: center; gap: 6px;">
+                                🔄 Sync Now
+                            </button>
+                            <input type="text" class="search-bar" placeholder="Search..." id="nh-schedule-search">
+                            <a href="https://calendar.google.com/calendar/u/0/r?cid=c_522e12f3a96c2d0193039d7df011aaf4299328eae771a53fe53473ce8a64b033@group.calendar.google.com" target="_blank" class="btn-secondary" style="text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
+                                📅 View Google Calendar
+                            </a>
+                            <button class="btn-primary" onclick="openAddEventModalNH()">+ Add Event</button>
+                        </div>
+                    </div>
+                    <div class="schedule-intro">
+                        <p>View upcoming new hire training sessions, deadlines, and milestones. Events can be added to your <strong>Pre-Origination Training and Refreshers</strong> Google Calendar.</p>
+                    </div>
+                    <div class="schedule-layout-grid">
+                        <div class="calendar-section">
+                            <div class="calendar-header">
+                                <button class="calendar-nav-btn" onclick="previousMonthNH()">‹</button>
+                                <h3 id="nh-current-month">May 2026</h3>
+                                <button class="calendar-nav-btn" onclick="nextMonthNH()">›</button>
+                            </div>
+                            <div class="calendar-grid" id="nh-calendar-grid"></div>
+                        </div>
+                        <div class="upcoming-section">
+                            <h3>Upcoming Sessions</h3>
+                            <div id="nh-events-list" class="upcoming-sessions-list"></div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Schedule Tab -->
+            <div id="schedule" class="tab-content">
+                <section class="section">
+                    <div class="schedule-header-bar">
+                        <h2>Refresher Training Schedule</h2>
+                        <div class="schedule-header-actions">
+                            <span id="sync-status" style="font-size: 0.85rem; color: #666; margin-right: 12px;">Ready to sync</span>
+                            <button class="btn-secondary" onclick="manualSync()" style="display: inline-flex; align-items: center; gap: 6px;">
+                                🔄 Sync Now
+                            </button>
+                            <input type="text" class="search-bar" placeholder="Search..." id="schedule-search">
+                            <a href="https://calendar.google.com/calendar/u/0/r?cid=c_522e12f3a96c2d0193039d7df011aaf4299328eae771a53fe53473ce8a64b033@group.calendar.google.com" target="_blank" class="btn-secondary" style="text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
+                                📅 View Google Calendar
+                            </a>
+                            <button class="btn-primary" onclick="openAddEventModal()">+ Add Event</button>
+                        </div>
+                    </div>
+
+                    <div class="schedule-intro">
+                        <p>View upcoming refresher sessions, deadlines, and milestones. Events can be added to your <strong>Pre-Origination Training and Refreshers</strong> Google Calendar.</p>
+                    </div>
+
+                    <div class="schedule-layout-grid">
+                        <!-- Calendar Section -->
+                        <div class="calendar-section">
+                            <div class="calendar-header">
+                                <button class="calendar-nav-btn" onclick="previousMonth()">‹</button>
+                                <h3 id="current-month">May 2026</h3>
+                                <button class="calendar-nav-btn" onclick="nextMonth()">›</button>
+                            </div>
+                            
+                            <div class="calendar-grid" id="calendar-grid">
+                                <!-- Calendar will be populated by JavaScript -->
+                            </div>
+                        </div>
+
+                        <!-- Upcoming Sessions Section -->
+                        <div class="upcoming-section">
+                            <h3>Upcoming Sessions</h3>
+                            <div id="events-list" class="upcoming-sessions-list">
+                                <!-- Events will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- When To SSP Tab -->
+            <div id="ssp" class="tab-content">
+                <section class="section">
+                    <h2>📝 When To SSP? - Practice Scenarios</h2>
+                    <p class="section-intro">Practice identifying when to send Supplemental Supporting Information (SSP) requests to merchants. Review scenarios and select the appropriate SSP type.</p>
+
+                    <div class="ssp-top-section">
+                        <div class="ssp-resources">
+                            <h3>📚 SSP Reference Documents</h3>
+                            <div class="resource-links">
+                                <a href="https://docs.google.com/document/d/1pGkOQIT4GAV5P4EEcQzv3sRKH5xTGM5pMtH2kVmKCeM/edit" target="_blank" class="ssp-doc-link">
+                                    📄 Capital SSP Request - Master Document
+                                </a>
+                                <a href="https://docs.google.com/document/d/1cpcU_2RfpfdzhIsAE1XblzChXdRZdUB-TJO1TgG9tBA/edit" target="_blank" class="ssp-doc-link">
+                                    📄 SSP Language Update and Additions
+                                </a>
+                                <a href="https://docs.google.com/document/d/1VoXJRtGHYjr7BU0Ya2P9SnNZWeVqUlwbUG_VBNbdWTA/edit" target="_blank" class="ssp-doc-link">
+                                    📄 SSP and Macro Language Updates
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="ssp-progress">
+                            <div class="progress-header">
+                                <h3>🎯 Your Progress</h3>
+                                <span id="ssp-progress-text">0 of 16 scenarios completed</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="ssp-progress-fill" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ssp-categories-section">
+                        <h3>📂 Choose a Category to Practice</h3>
+                        <div class="ssp-filter-bar">
+                            <button class="filter-btn active" data-category="all">
+                                📋 All Scenarios
+                            </button>
+                            <button class="filter-btn" data-category="processing">
+                                🔵 Processing
+                            </button>
+                            <button class="filter-btn" data-category="debt">
+                                🔴 Debt
+                            </button>
+                            <button class="filter-btn" data-category="legitimacy">
+                                🟢 Business Legitimacy
+                            </button>
+                            <button class="filter-btn" data-category="verification">
+                                🟠 Verification
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="ssp-scenarios-container">
+                        <!-- SSP scenarios will be populated by JavaScript in category sections -->
+                    </div>
+                </section>
+            </div>
+
+            <!-- Simulator Tab -->
+            <!-- CASE SIMULATOR: Compliance Flex/Term -->
+            <div id="simulator-compliance-flex" class="tab-content">
+                <section>
+                    <div class="section" style="margin-bottom:16px;">
+                        <h2>🎯 Compliance Flex/Term Case Simulator</h2>
+                        <p class="simulator-intro" style="margin-bottom:0;">Practice compliance flex/term pre-origination skills with realistic case scenarios. Select a case type to begin:</p>
+                    </div>
+
+                    <div class="simulator-stats" id="stats-compliance-flex">
+                        <h3>📈 Your Progress</h3>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <span class="stat-number" id="cases-completed-compliance-flex">0</span>
+                                <span class="stat-label">Cases Completed</span>
+                            </div>
+                            <div class="stat-card">
+                                <span class="stat-number" id="accuracy-rate-compliance-flex">0%</span>
+                                <span class="stat-label">Accuracy Rate</span>
+                            </div>
+                            <div class="stat-card">
+                                <span class="stat-number" id="avg-time-compliance-flex">0m</span>
+                                <span class="stat-label">Avg. Time</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="simulator-controls">
+                        <label for="case-type-compliance-flex">Select Case Type:</label>
+                        <select id="case-type-compliance-flex" onchange="loadCase('compliance-flex')">
+                            <option value="">-- Choose a scenario --</option>
+                            <option value="compliance">Compliance Application Review Flow</option>
+                            <option value="linked-account">Linked Account Review</option>
+                            <option value="revised-offer">Revised Offer Scenario</option>
+                        </select>
+                    </div>
+
+                    <div id="case-container-compliance-flex" class="case-container" style="display: none;">
+                        <div class="case-header">
+                            <h3 id="case-title-compliance-flex">Case Title</h3>
+                            <span id="case-difficulty-compliance-flex" class="difficulty-badge">Difficulty: Medium</span>
+                        </div>
+                        <div class="case-details">
+                            <h4>📋 Case Details</h4>
+                            <div id="case-description-compliance-flex"></div>
+                        </div>
+                        <div class="case-data">
+                            <h4>📊 Merchant Information</h4>
+                            <div id="merchant-info-compliance-flex"></div>
+                        </div>
+                        <div class="case-questions">
+                            <h4>❓ Assessment Questions</h4>
+                            <div id="questions-container-compliance-flex"></div>
+                        </div>
+                        <div class="case-actions">
+                            <button class="btn-primary" onclick="submitCase('compliance-flex')">Submit Assessment</button>
+                            <button class="btn-secondary" onclick="resetCase('compliance-flex')">Reset</button>
+                        </div>
+                        <div id="feedback-container-compliance-flex" class="feedback-container" style="display: none;">
+                            <h4>📝 Feedback</h4>
+                            <div id="feedback-content-compliance-flex"></div>
+                            <button class="btn-secondary" onclick="loadNextCase('compliance-flex')">Next Case</button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- CASE SIMULATOR: Compliance STL -->
+            <div id="simulator-compliance-stl" class="tab-content">
+                <section>
+                    <div class="section" style="margin-bottom:16px;">
+                        <h2>🎯 Compliance STL Case Simulator</h2>
+                        <p class="simulator-intro" style="margin-bottom:0;">Practice compliance STL pre-origination skills with realistic case scenarios. Select a case type to begin:</p>
+                    </div>
+
+                    <div class="simulator-stats" id="stats-compliance-stl">
+                        <h3>📈 Your Progress</h3>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <span class="stat-number" id="cases-completed-compliance-stl">0</span>
+                                <span class="stat-label">Cases Completed</span>
+                            </div>
+                            <div class="stat-card">
+                                <span class="stat-number" id="accuracy-rate-compliance-stl">0%</span>
+                                <span class="stat-label">Accuracy Rate</span>
+                            </div>
+                            <div class="stat-card">
+                                <span class="stat-number" id="avg-time-compliance-stl">0m</span>
+                                <span class="stat-label">Avg. Time</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="simulator-controls">
+                        <label for="case-type-compliance-stl">Select Case Type:</label>
+                        <select id="case-type-compliance-stl" onchange="loadCase('compliance-stl')">
+                            <option value="">-- Choose a scenario --</option>
+                            <option value="cbd">CBD (Cannabis-Related Business) Review</option>
+                            <option value="adverse-activity">Adverse Account Activity Review</option>
+                            <option value="standard">Standard Manual Review - Credit Operations</option>
+                        </select>
+                    </div>
+
+                    <div id="case-container-compliance-stl" class="case-container" style="display: none;">
+                        <div class="case-header">
+                            <h3 id="case-title-compliance-stl">Case Title</h3>
+                            <span id="case-difficulty-compliance-stl" class="difficulty-badge">Difficulty: Medium</span>
+                        </div>
+                        <div class="case-details">
+                            <h4>📋 Case Details</h4>
+                            <div id="case-description-compliance-stl"></div>
+                        </div>
+                        <div class="case-data">
+                            <h4>📊 Merchant Information</h4>
+                            <div id="merchant-info-compliance-stl"></div>
+                        </div>
+                        <div class="case-questions">
+                            <h4>❓ Assessment Questions</h4>
+                            <div id="questions-container-compliance-stl"></div>
+                        </div>
+                        <div class="case-actions">
+                            <button class="btn-primary" onclick="submitCase('compliance-stl')">Submit Assessment</button>
+                            <button class="btn-secondary" onclick="resetCase('compliance-stl')">Reset</button>
+                        </div>
+                        <div id="feedback-container-compliance-stl" class="feedback-container" style="display: none;">
+                            <h4>📝 Feedback</h4>
+                            <div id="feedback-content-compliance-stl"></div>
+                            <button class="btn-secondary" onclick="loadNextCase('compliance-stl')">Next Case</button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- CASE SIMULATOR: Risk Flex/Term -->
+            <div id="simulator-risk-flex" class="tab-content">
+                <section>
+                    <div class="section" style="margin-bottom:16px;">
+                        <h2>🎯 Risk Flex/Term Case Simulator</h2>
+                        <p class="simulator-intro" style="margin-bottom:0;">Practice risk flex/term pre-origination skills with realistic case scenarios. Select a case type to begin:</p>
+                    </div>
+
+                    <div class="simulator-stats" id="stats-risk-flex">
+                        <h3>📈 Your Progress</h3>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <span class="stat-number" id="cases-completed-risk-flex">0</span>
+                                <span class="stat-label">Cases Completed</span>
+                            </div>
+                            <div class="stat-card">
+                                <span class="stat-number" id="accuracy-rate-risk-flex">0%</span>
+                                <span class="stat-label">Accuracy Rate</span>
+                            </div>
+                            <div class="stat-card">
+                                <span class="stat-number" id="avg-time-risk-flex">0m</span>
+                                <span class="stat-label">Avg. Time</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="simulator-controls">
+                        <label for="case-type-risk-flex">Select Case Type:</label>
+                        <select id="case-type-risk-flex" onchange="loadCase('risk-flex')">
+                            <option value="">-- Choose a scenario --</option>
+                            <option value="seasonality">Seasonality Assessment</option>
+                            <option value="credit-risk-escalation">Credit Risk Escalation</option>
+                            <option value="standard">Standard Manual Review - Credit Operations</option>
+                        </select>
+                    </div>
+
+                    <div id="case-container-risk-flex" class="case-container" style="display: none;">
+                        <div class="case-header">
+                            <h3 id="case-title-risk-flex">Case Title</h3>
+                            <span id="case-difficulty-risk-flex" class="difficulty-badge">Difficulty: Medium</span>
+                        </div>
+                        <div class="case-details">
+                            <h4>📋 Case Details</h4>
+                            <div id="case-description-risk-flex"></div>
+                        </div>
+                        <div class="case-data">
+                            <h4>📊 Merchant Information</h4>
+                            <div id="merchant-info-risk-flex"></div>
+                        </div>
+                        <div class="case-questions">
+                            <h4>❓ Assessment Questions</h4>
+                            <div id="questions-container-risk-flex"></div>
+                        </div>
+                        <div class="case-actions">
+                            <button class="btn-primary" onclick="submitCase('risk-flex')">Submit Assessment</button>
+                            <button class="btn-secondary" onclick="resetCase('risk-flex')">Reset</button>
+                        </div>
+                        <div id="feedback-container-risk-flex" class="feedback-container" style="display: none;">
+                            <h4>📝 Feedback</h4>
+                            <div id="feedback-content-risk-flex"></div>
+                            <button class="btn-secondary" onclick="loadNextCase('risk-flex')">Next Case</button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+
+
+            <!-- CASE SIMULATOR: Email Practice -->
+            <div id="simulator-email" class="tab-content">
+                <section style="background:none;box-shadow:none;padding:0;">
+                    <div class="email-practice-layout">
+
+                        <!-- LEFT: Scenario List -->
+                        <div class="email-scenario-panel section">
+                            <h3>Select a Scenario</h3>
+                            <div class="email-scenario-list" id="email-scenario-list">
+                                <div class="email-scenario-item" data-scenario="current-standing" onclick="selectEmailScenario('current-standing')">
+                                    <div class="email-scenario-title">Current Standing on Loan</div>
+                                    <span class="email-difficulty easy">Easy</span>
+                                </div>
+                                <div class="email-scenario-item" data-scenario="ptp" onclick="selectEmailScenario('ptp')">
+                                    <div class="email-scenario-title">Past Due - Promise to Pay (PTP)</div>
+                                    <span class="email-difficulty easy">Easy</span>
+                                </div>
+                                <div class="email-scenario-item" data-scenario="repayment-lien" onclick="selectEmailScenario('repayment-lien')">
+                                    <div class="email-scenario-title">Repayment Option for Lien on Account</div>
+                                    <span class="email-difficulty medium">Medium</span>
+                                </div>
+                                <div class="email-scenario-item" data-scenario="deactivated-repayment" onclick="selectEmailScenario('deactivated-repayment')">
+                                    <div class="email-scenario-title">Deactivated Account - Needs Repayment Option</div>
+                                    <span class="email-difficulty hard">Hard</span>
+                                </div>
+                                <div class="email-scenario-item" data-scenario="maturity-extension" onclick="selectEmailScenario('maturity-extension')">
+                                    <div class="email-scenario-title">Loan Maturity - Extension Request</div>
+                                    <span class="email-difficulty medium">Medium</span>
+                                </div>
+                                <div class="email-scenario-item" data-scenario="false-evasion" onclick="selectEmailScenario('false-evasion')">
+                                    <div class="email-scenario-title">False Evasion - Docs Pushback</div>
+                                    <span class="email-difficulty hard">Hard</span>
+                                </div>
+                                <div class="email-scenario-item" data-scenario="settlement-offer" onclick="selectEmailScenario('settlement-offer')">
+                                    <div class="email-scenario-title">Settlement Offer Response</div>
+                                    <span class="email-difficulty hard">Hard</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CENTER: Salesforce-style Email Window -->
+                        <div class="email-sf-panel" id="email-compose-panel">
+                            <!-- Placeholder -->
+                            <div class="email-compose-placeholder section" id="email-placeholder">
+                                <div class="email-placeholder-icon">✉️</div>
+                                <p>Select a scenario to begin practicing.</p>
+                            </div>
+
+                            <!-- Active compose window -->
+                            <div id="email-compose-area" style="display:none;">
+                                <!-- SF Title Bar -->
+                                <div class="email-sf-titlebar">
+                                    <span class="email-sf-dots"><span></span><span></span><span></span></span>
+                                    <span class="email-sf-title-icon">📧</span>
+                                    <span class="email-sf-title-text" id="email-sf-title">Salesforce — New Email Activity | Case #CS-2026-00001</span>
+                                </div>
+
+                                <!-- Scenario Brief -->
+                                <div class="email-sf-brief" id="email-scenario-brief"></div>
+
+                                <!-- Email Fields -->
+                                <div class="email-sf-fields">
+                                    <div class="email-sf-row">
+                                        <span class="email-sf-label">TO</span>
+                                        <span class="email-sf-value" id="email-to-display"></span>
+                                    </div>
+                                    <div class="email-sf-row">
+                                        <span class="email-sf-label">FROM</span>
+                                        <span class="email-sf-value">SFS Collections &lt;<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="52213421313d3e3e3731263b3d3c211221232733203727227c313d3f">[email&#160;protected]</a>&gt;</span>
+                                    </div>
+                                    <div class="email-sf-row">
+                                        <span class="email-sf-label">SUBJECT</span>
+                                        <input type="text" id="email-subject" class="email-sf-subject-input" placeholder="RE: Message from Square">
+                                    </div>
+                                </div>
+
+                                <!-- Message Body -->
+                                <div class="email-sf-body-section">
+                                    <div class="email-sf-body-label">MESSAGE BODY</div>
+                                    <div class="email-sf-toolbar">
+                                        <button class="email-toolbar-btn" onclick="loadEmailTemplate()">📄 Load Template</button>
+                                        <button class="email-toolbar-btn" onclick="clearEmailDraft()">🗑 Clear</button>
+                                        <button class="email-toolbar-btn" onclick="insertEmailGreeting()">👋 Insert Greeting</button>
+                                        <button class="email-toolbar-btn" onclick="insertEmailSignature()">✍️ Insert Signature</button>
+                                    </div>
+                                    <textarea id="email-body" class="email-sf-textarea" placeholder="Write your email here..."></textarea>
+                                </div>
+
+                                <!-- Send / Reset -->
+                                <div class="email-sf-actions">
+                                    <button class="email-send-btn" onclick="submitEmailPractice()">📤 Send Email</button>
+                                    <button class="email-reset-btn" onclick="resetEmailScenario()">↺ Reset</button>
+                                </div>
+
+                                <!-- Feedback & Score (hidden until Send) -->
+                                <div class="email-feedback-section" id="email-feedback" style="display:none;">
+                                    <div class="email-feedback-header">🏁 Email Feedback &amp; Score</div>
+                                    <div class="email-feedback-scores">
+                                        <div class="email-score-box">
+                                            <div class="email-score-label">Overall Score</div>
+                                            <div class="email-score-value" id="email-score-pct">0%</div>
+                                        </div>
+                                        <div class="email-score-box">
+                                            <div class="email-score-label">Result</div>
+                                            <div class="email-score-result" id="email-score-result">—</div>
+                                        </div>
+                                    </div>
+                                    <div class="email-rubric" id="email-rubric"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- RIGHT: Macro Search -->
+                        <div class="email-macro-panel section" id="email-macro-panel">
+                            <h3>🔍 Macro Search</h3>
+                            <input type="text" class="macro-search-input" id="macro-search-input" placeholder="Search macros..." oninput="filterMacros()">
+                            <div class="macro-category-filters" id="macro-category-filters">
+                                <button class="macro-cat-btn active" data-cat="all" onclick="setMacroCat(this,'all')">All</button>
+                                <button class="macro-cat-btn" data-cat="Add Payer" onclick="setMacroCat(this,'Add Payer')">Add Payer</button>
+                                <button class="macro-cat-btn" data-cat="Collections - ACH" onclick="setMacroCat(this,'Collections - ACH')">Collections - ACH</button>
+                                <button class="macro-cat-btn" data-cat="Collections - Deceased" onclick="setMacroCat(this,'Collections - Deceased')">Collections - Deceased</button>
+                                <button class="macro-cat-btn" data-cat="Collections - General" onclick="setMacroCat(this,'Collections - General')">Collections - General</button>
+                                <button class="macro-cat-btn" data-cat="Collections - Maturity" onclick="setMacroCat(this,'Collections - Maturity')">Collections - Maturity</button>
+                                <button class="macro-cat-btn" data-cat="Collections - PTP" onclick="setMacroCat(this,'Collections - PTP')">Collections - PTP</button>
+                                <button class="macro-cat-btn" data-cat="Collections - Payment Plan" onclick="setMacroCat(this,'Collections - Payment Plan')">Collections - Payment Plan</button>
+                                <button class="macro-cat-btn" data-cat="Collections - Settlement" onclick="setMacroCat(this,'Collections - Settlement')">Collections - Settlement</button>
+                                <button class="macro-cat-btn" data-cat="Compliance" onclick="setMacroCat(this,'Compliance')">Compliance</button>
+                                <button class="macro-cat-btn" data-cat="Deceased" onclick="setMacroCat(this,'Deceased')">Deceased</button>
+                                <button class="macro-cat-btn" data-cat="Flex Loan" onclick="setMacroCat(this,'Flex Loan')">Flex Loan</button>
+                                <button class="macro-cat-btn" data-cat="General" onclick="setMacroCat(this,'General')">General</button>
+                                <button class="macro-cat-btn" data-cat="Payments" onclick="setMacroCat(this,'Payments')">Payments</button>
+                                <button class="macro-cat-btn" data-cat="Relief" onclick="setMacroCat(this,'Relief')">Relief</button>
+                                <button class="macro-cat-btn" data-cat="Term Loan" onclick="setMacroCat(this,'Term Loan')">Term Loan</button>
+                            </div>
+                            <div class="macro-count" id="macro-count"></div>
+                            <div class="macro-list" id="macro-list"></div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- MY PROGRESS TAB -->
+            <div id="progress" class="tab-content">
+                <div class="section">
+                    <div class="progress-page-header">
+                        <div>
+                            <h2 class="progress-page-title">My Progress</h2>
+                            <p class="progress-page-sub">Track your personal learning progress.</p>
+                        </div>
+                        <span class="progress-quarter-badge" id="progress-quarter-badge">Q2 2026</span>
+                    </div>
+
+                    <div class="progress-grid">
+                        <!-- Overall Completion Card -->
+                        <div class="progress-card overall-card">
+                            <h3 class="progress-card-title">Overall Completion</h3>
+                            <div class="donut-wrapper">
+                                <svg class="donut-svg" viewBox="0 0 120 120">
+                                    <defs>
+                                        <linearGradient id="donutGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                            <stop offset="0%"   stop-color="#00C8C8"/>
+                                            <stop offset="100%" stop-color="#FF3300"/>
+                                        </linearGradient>
+                                    </defs>
+                                    <circle class="donut-bg"  cx="60" cy="60" r="48" />
+                                    <circle class="donut-fill" cx="60" cy="60" r="48"
+                                        id="donut-fill-circle"
+                                        stroke-dasharray="0 301.59"
+                                        stroke-dashoffset="75.4" />
+                                </svg>
+                                <div class="donut-label">
+                                    <span class="donut-pct" id="donut-pct">0%</span>
+                                    <span class="donut-sub">Complete</span>
+                                </div>
+                            </div>
+                            <p class="overall-summary" id="overall-summary">0 of 12 modules completed</p>
+                            <p class="overall-hrs" id="overall-hrs">~12 hrs remaining</p>
+                        </div>
+
+                        <!-- Module Progress Card -->
+                        <div class="progress-card module-card">
+                            <h3 class="progress-card-title">Module Progress</h3>
+                            <table class="module-table">
+                                <thead>
+                                    <tr>
+                                        <th>MODULE</th>
+                                        <th>CATEGORY</th>
+                                        <th>STATUS</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="module-table-body">
+                                    <!-- Populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- end #progress -->
+
+        </div><!-- end .main-content -->
+    </div><!-- end .app-layout -->
+
+    <!-- Add Event Modal -->
+    <div id="add-event-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add Refresher Training Event</h3>
+                <span class="modal-close" onclick="closeAddEventModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="add-event-form" onsubmit="saveEvent(event)">
+                    <div class="form-group">
+                        <label for="event-title">Event Title *</label>
+                        <input type="text" id="event-title" required placeholder="e.g., CBD Refresher Training">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="event-type">Refresher Type *</label>
+                        <select id="event-type" required>
+                            <option value="">Select refresher type...</option>
+                            <option value="linked-account">Linked Account Refresher</option>
+                            <option value="cbd">CBD Refresher</option>
+                            <option value="credit-risk">Credit Risk Refresher</option>
+                            <option value="seasonality">Seasonality Refresher</option>
+                            <option value="adverse-activity">Adverse Account Activity Refresher</option>
+                            <option value="tosv">Pre-Origination TOSV Refresher</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="event-date">Date *</label>
+                            <input type="date" id="event-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="event-time">Time *</label>
+                            <input type="time" id="event-time" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="event-duration">Duration (minutes) *</label>
+                        <input type="number" id="event-duration" required value="60" min="15" step="15">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="event-instructor">Instructor *</label>
+                        <input type="text" id="event-instructor" required placeholder="Instructor name">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="event-description">Description</label>
+                        <textarea id="event-description" rows="3" placeholder="Brief description of the refresher session..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="event-presentation">Presentation Link</label>
+                        <input type="url" id="event-presentation" placeholder="https://docs.google.com/presentation/...">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="event-quiz">Quiz Link</label>
+                        <input type="url" id="event-quiz" placeholder="https://forms.google.com/...">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="event-location">Location/Link *</label>
+                        <input type="text" id="event-location" required placeholder="Zoom link or room number">
+                    </div>
+
+                    <div class="form-group checkbox-group">
+                        <label>
+                            <input type="checkbox" id="event-async">
+                            Async option available
+                        </label>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" onclick="closeAddEventModal()">Cancel</button>
+                        <button type="submit" class="btn-primary">Add Event</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Event Detail Modal -->
+    <div id="event-detail-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="detail-event-title">Event Title</h3>
+                <span class="modal-close" onclick="closeEventDetailModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="event-detail-content">
+                    <!-- Event details will be populated by JavaScript -->
+                </div>
+                <div class="event-actions">
+                    <button class="btn-primary" id="attend-btn" onclick="markAttendance('live')">
+                        ✓ Attend Live Session
+                    </button>
+                    <button class="btn-secondary" id="async-btn" onclick="markAttendance('async')" style="display: none;">
+                        📚 Take Async
+                    </button>
+                    <button class="btn-secondary" id="add-to-gcal-btn" onclick="addToGoogleCalendar(document.getElementById('event-detail-modal').dataset.eventId)" style="background: #4285f4; color: white;">
+                        📅 Add to Google Calendar
+                    </button>
+                    <button class="btn-secondary" onclick="openEditEventModal(document.getElementById('event-detail-modal').dataset.eventId); closeEventDetailModal();" style="background: #ff9800; color: white;">
+                        ✏️ Edit Event
+                    </button>
+                    <button class="btn-secondary" onclick="deleteEvent(document.getElementById('event-detail-modal').dataset.eventId)" style="background: #f44336; color: white;">
+                        🗑️ Delete Event
+                    </button>
+                    <button class="btn-secondary" onclick="closeEventDetailModal()">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Update Modal -->
+    <div id="add-update-modal" class="modal">
+        <div class="modal-content" style="max-width: 520px;">
+            <div class="modal-header">
+                <h3>📣 Post an Update</h3>
+                <span class="modal-close" onclick="closeAddUpdateModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="add-update-form" onsubmit="saveUpdate(event)">
+                    <div class="form-group">
+                        <label for="update-title">Title *</label>
+                        <input type="text" id="update-title" required placeholder="e.g., New SOP Published">
+                    </div>
+                    <div class="form-group">
+                        <label for="update-type">Type *</label>
+                        <select id="update-type" required>
+                            <option value="">Select type...</option>
+                            <option value="announcement">📢 Announcement</option>
+                            <option value="reminder">⏰ Reminder</option>
+                            <option value="new-resource">📄 New Resource</option>
+                            <option value="policy-change">⚠️ Policy Change</option>
+
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="update-body">Message *</label>
+                        <textarea id="update-body" rows="4" required placeholder="Write your update here..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Posted by</label>
+                        <input type="text" id="update-author" readonly style="background:#f5f5f5;color:#666;cursor:not-allowed;" placeholder="Auto-filled from your account">
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" onclick="closeAddUpdateModal()">Cancel</button>
+                        <button type="submit" class="btn-primary">Post Update</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="calendar.js?v=1778644490"></script>
+    <script src="calendar-sync.js?v=1778644490"></script>
+    <script src="ssp-scenarios.js?v=1778644490"></script>
+    <script src="script.js?v=1778695096"></script>
+</body>
+</html>
