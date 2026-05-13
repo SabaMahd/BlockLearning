@@ -1,9 +1,9 @@
-# Block Cell - SFS Pre-Origination Training Platform
+# Block Learning - SFS Pre-Origination Training Platform
 
 Professional training platform for Square Financial Services (SFS) Pre-Origination compliance and credit review.
 
 ## 🌐 Live Site
-**https://sabamahd.github.io/BlockCellTraining/**
+**https://sabamahd.github.io/BlockLearning/**
 
 ## ✨ Features
 
@@ -93,8 +93,8 @@ Professional training platform for Square Financial Services (SFS) Pre-Originati
 
 ## 🔗 Important Links
 
-- **Live Training Site**: https://sabamahd.github.io/BlockCellTraining/
-- **Block Cell SOP Site**: https://blockcell.sqprod.co/sites/sfs-pre-orig-training/
+- **Live Training Site**: https://sabamahd.github.io/BlockLearning/
+- **Block Learning SOP Site**: https://blockcell.sqprod.co/sites/sfs-pre-orig-training/
 - **Regulator Tool**: https://regulator.sqprod.co
 - **Google Calendar**: [Pre-Origination Training Calendar](https://calendar.google.com/calendar/u/0/r?cid=c_522e12f3a96c2d0193039d7df011aaf4299328eae771a53fe53473ce8a64b033@group.calendar.google.com)
 
@@ -118,4 +118,4 @@ Questions? Check the **Support & Contacts** tab for:
 
 ---
 
-Built with ❤️ for Block Cell Training
+Built with ❤️ for Block Learning Training
